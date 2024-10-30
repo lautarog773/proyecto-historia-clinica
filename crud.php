@@ -37,14 +37,8 @@
     <div class="topbar d-flex align-items-center">
       <div class="container d-flex justify-content-center justify-content-md-between">
         <div class="contact-info d-flex align-items-center">
-          <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">contact@example.com</a></i>
-          <i class="bi bi-phone d-flex align-items-center ms-4"><span>+1 5589 55488 55</span></i>
-        </div>
-        <div class="social-links d-none d-md-flex align-items-center">
-          <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-          <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+          <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:info@historiaclinica.com">info@historiaclinica.com</a></i>
+          <i class="bi bi-phone d-flex align-items-center ms-4"><span>+0800 555 2368</span></i>
         </div>
       </div>
     </div><!-- End Top Bar -->
@@ -61,33 +55,21 @@
         <nav id="navmenu" class="navmenu">
           <ul>
             <li><a href="index.html" class="active">Inicio<br></a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#mi-perfil">Perfil</a></li>
-            <li><a href="#departments">Departments</a></li>
-            <li><a href="#doctors">Profesionales</a></li>
-            <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-              <ul>
-                <li><a href="#">Dropdown 1</a></li>
-                <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                  <ul>
-                    <li><a href="#">Deep Dropdown 1</a></li>
-                    <li><a href="#">Deep Dropdown 2</a></li>
-                    <li><a href="#">Deep Dropdown 3</a></li>
-                    <li><a href="#">Deep Dropdown 4</a></li>
-                    <li><a href="#">Deep Dropdown 5</a></li>
-                  </ul>
-                </li>
-                <li><a href="#">Dropdown 2</a></li>
-                <li><a href="#">Dropdown 3</a></li>
-                <li><a href="#">Dropdown 4</a></li>
+            <li><a href="perfil.php">Mi Perfil</a></li>
+            <li><a href="consulta.php">Consultas</a></li>
+            <li class="dropdown"><a href="crud.php"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+              <ul>                
+                <li><a href="crud_especialidades.php">Especialidades</a></li>
+                <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
+                <li><a href="crud_cuentas.php">Cuentas</a></li>
               </ul>
             </li>
-            <li><a href="#contact">Contacto</a></li>
+            <li><a href="contact.php">Contacto</a></li>
           </ul>
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
 
-        <a class="cta-btn d-none d-sm-block" href="#appointment">Cerrar Sesión</a>
+        <a class="cta-btn d-none d-sm-block" href="login.php">Cerrar Sesión</a>
 
       </div>
 
@@ -112,7 +94,6 @@
 
       <div class="container">
 
-   
         <div class="row gy-4">
 
           <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
