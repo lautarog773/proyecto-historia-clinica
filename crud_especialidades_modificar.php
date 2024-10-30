@@ -1,19 +1,33 @@
 <?php
 include "conexion.php";
 
-// Validar y obtener el id_cuenta de forma segura
-$id_cuenta = isset($_GET['id_cuenta']) ? intval($_GET['id_cuenta']) : 0;
+// Validar si se envió el formulario de actualización
+if (isset($_POST['actualizar'])) {
+    // Obtener los datos enviados desde el formulario
+    $id_cuenta = intval($_POST['id_cuenta']);
+    $nombre = $_POST['nombre'];
 
-// Preparar la consulta con sentencia preparada para evitar SQL Injection
-$stmt = $conexion->prepare("SELECT * FROM especialidades WHERE id_Especialidad = ?");
+    // Preparar la consulta de actualización para evitar SQL Injection
+    $stmt = $conexion->prepare("UPDATE especialidades SET Nombre = ? WHERE ID_Especialidad = ?");
+    $stmt->bind_param("si", $nombre, $id_cuenta);
+
+    // Ejecutar la consulta y verificar si se actualizó correctamente
+    if ($stmt->execute()) {
+        echo "<script>alert('Especialidad actualizada exitosamente');</script>";
+        echo "<script>window.location.href = 'crud_especialidades.php';</script>"; // Redirige al listado
+    } else {
+        echo "<script>alert('Error al actualizar la especialidad');</script>";
+    }
+
+    $stmt->close();
+}
+
+// Obtener el id_cuenta de forma segura para mostrar los datos en el formulario
+$id_cuenta = isset($_GET['id_cuenta']) ? intval($_GET['id_cuenta']) : 0;
+$stmt = $conexion->prepare("SELECT * FROM especialidades WHERE ID_Especialidad = ?");
 $stmt->bind_param("i", $id_cuenta);
 $stmt->execute();
 $result = $stmt->get_result();
-
-
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -25,25 +39,17 @@ $result = $stmt->get_result();
   <title>Historia Clínica Digital</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
-
-  <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
-  <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 </head>
 

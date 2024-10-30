@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -120,7 +121,8 @@
                   <td><?= $datos->Nombre ?></td>
                   <td>
                     <a href="crud_especialidades_modificar.php?id_cuenta=<?= $datos->ID_Especialidad ?>"><i class="fa-solid fa-user-pen"></i></a>
-                    <a href=""><i class="fa-solid fa-trash"></i></a>
+                    <a href="crud_especialidades_eliminar.php?id=<?= $datos->ID_Especialidad ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar esta especialidad?');"><i class="fa-solid fa-trash"></i></a>
+
                   </td>
                 </tr>
               <?php }

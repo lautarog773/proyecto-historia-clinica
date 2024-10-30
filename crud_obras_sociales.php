@@ -122,7 +122,9 @@
                   <td><?= $datos->Nombre ?></td>
                   <td>
                     <a href="crud_obras_sociales_modificar.php?id_cuenta=<?= $datos->ID_OS ?>"><i class="fa-solid fa-user-pen"></i></a>
-                    <a href=""><i class="fa-solid fa-trash"></i></a>
+                    <a href="crud_obras_sociales_eliminar.php?id=<?= $datos->ID_OS ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar esta obra social?');">
+                      <i class="fa-solid fa-trash"></i>
+                    </a>
                   </td>
                 </tr>
               <?php }

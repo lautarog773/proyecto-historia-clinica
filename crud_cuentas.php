@@ -132,7 +132,9 @@
                   <td>
 
                     <a href="crud_cuentas_modificar.php?id_cuenta=<?= $datos->ID_Cuenta ?>"><i class="fa-solid fa-user-pen"></i></a>
-                    <a href=""><i class="fa-solid fa-trash"></i></a>
+                    <a href="crud_cuentas_eliminar.php?id=<?= $datos->ID_Cuenta ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar esta cuenta?');">
+                      <i class="fa-solid fa-trash"></i>
+                    </a>
                   </td>
                 </tr>
               <?php }
