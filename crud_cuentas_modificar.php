@@ -1,19 +1,34 @@
 <?php
 include "conexion.php";
 
-// Validar y obtener el id_cuenta de forma segura
-$id_cuenta = isset($_GET['id_cuenta']) ? intval($_GET['id_cuenta']) : 0;
+// Validar si se envió el formulario de actualización
+if (isset($_POST['actualizar'])) {
+    // Obtener los datos enviados desde el formulario
+    $id_cuenta = intval($_POST['id_cuenta']);
+    $id_tipo = $_POST['id_tipo'];
+    $mail = $_POST['mail'];
 
-// Preparar la consulta con sentencia preparada para evitar SQL Injection
-$stmt = $conexion->prepare("SELECT * FROM especialidades WHERE id_Especialidad = ?");
+    // Preparar la consulta de actualización para evitar SQL Injection
+    $stmt = $conexion->prepare("UPDATE cuentas SET ID_Tipo = ?, Mail = ? WHERE ID_Cuenta = ?");
+    $stmt->bind_param("isi", $id_tipo, $mail, $id_cuenta);
+
+    // Ejecutar la consulta y verificar si se actualizó correctamente
+    if ($stmt->execute()) {
+        echo "<script>alert('Cuenta actualizada exitosamente');</script>";
+        echo "<script>window.location.href = 'crud_cuentas.php';</script>"; // Redirige al listado
+    } else {
+        echo "<script>alert('Error al actualizar la cuenta');</script>";
+    }
+
+    $stmt->close();
+}
+
+// Obtener el id_cuenta de forma segura para mostrar los datos en el formulario
+$id_cuenta = isset($_GET['id_cuenta']) ? intval($_GET['id_cuenta']) : 0;
+$stmt = $conexion->prepare("SELECT * FROM cuentas WHERE ID_Cuenta = ?");
 $stmt->bind_param("i", $id_cuenta);
 $stmt->execute();
 $result = $stmt->get_result();
-
-
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -69,16 +84,22 @@ $result = $stmt->get_result();
     <section id="contact" class="contact section">
       <div class="container-fluid row">
         <!-- Formulario de modificación -->
-        <form method="POST" action="crud_especialidades_modificar.php" class="col-4 p-3 m-auto">
-          <?php while ($datos = $result->fetch_object()) { ?>
+        <form method="POST" action="crud_cuentas_modificar.php" class="col-4 p-3 m-auto">
+          <?php if ($datos = $result->fetch_object()) { ?>
             <div class="mb-3">
-              <label for="id_cuenta" class="form-label">ID Especialidad</label>
-              <input type="text" class="form-control" name="id_cuenta" value="<?= $datos->ID_Especialidad ?>" readonly>
+              <label for="id_cuenta" class="form-label">ID Cuenta</label>
+              <input type="text" class="form-control" name="id_cuenta" value="<?= $datos->ID_Cuenta ?>" readonly>
             </div>
             <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" name="nombre" value="<?= $datos->Nombre ?>">
+              <label for="id_tipo" class="form-label">ID Tipo</label>
+              <input type="text" class="form-control" name="id_tipo" value="<?= $datos->ID_Tipo ?>">
             </div>
+            <div class="mb-3">
+              <label for="mail" class="form-label">Mail</label>
+              <input type="text" class="form-control" name="mail" value="<?= $datos->Mail ?>">
+            </div>
+          <?php } else { ?>
+            <p>No se encontró la cuenta.</p>
           <?php } ?>
           <button type="submit" class="btn btn-primary" name="actualizar" value="ok">Actualizar</button>
         </form>

@@ -130,7 +130,8 @@
                   <td><?= $datos->ID_Tipo ?></td>
                   <td><?= $datos->Mail ?></td>
                   <td>
-                    <a href=""><i class="fa-solid fa-user-pen"></i></a>
+
+                    <a href="crud_cuentas_modificar.php?id_cuenta=<?= $datos->ID_Cuenta ?>"><i class="fa-solid fa-user-pen"></i></a>
                     <a href=""><i class="fa-solid fa-trash"></i></a>
                   </td>
                 </tr>

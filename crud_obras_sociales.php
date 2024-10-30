@@ -117,9 +117,11 @@
               while ($datos = $result->fetch_object()) { ?>
                 <tr>
                   <td><?= $datos->ID_OS ?></td>
+
+                  
                   <td><?= $datos->Nombre ?></td>
                   <td>
-                    <a href=""><i class="fa-solid fa-user-pen"></i></a>
+                    <a href="crud_obras_sociales_modificar.php?id_cuenta=<?= $datos->ID_OS ?>"><i class="fa-solid fa-user-pen"></i></a>
                     <a href=""><i class="fa-solid fa-trash"></i></a>
                   </td>
                 </tr>

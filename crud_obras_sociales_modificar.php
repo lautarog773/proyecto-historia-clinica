@@ -1,19 +1,33 @@
 <?php
 include "conexion.php";
 
-// Validar y obtener el id_cuenta de forma segura
-$id_cuenta = isset($_GET['id_cuenta']) ? intval($_GET['id_cuenta']) : 0;
+// Validar si se envió el formulario de actualización
+if (isset($_POST['actualizar'])) {
+    // Obtener los datos enviados desde el formulario
+    $id_os = intval($_POST['id_os']);
+    $nombre = $_POST['nombre'];
 
-// Preparar la consulta con sentencia preparada para evitar SQL Injection
-$stmt = $conexion->prepare("SELECT * FROM especialidades WHERE id_Especialidad = ?");
-$stmt->bind_param("i", $id_cuenta);
+    // Preparar la consulta de actualización para evitar SQL Injection
+    $stmt = $conexion->prepare("UPDATE obras_sociales SET Nombre = ? WHERE ID_OS = ?");
+    $stmt->bind_param("si", $nombre, $id_os);
+
+    // Ejecutar la consulta y verificar si se actualizó correctamente
+    if ($stmt->execute()) {
+        echo "<script>alert('Obra social actualizada exitosamente');</script>";
+        echo "<script>window.location.href = 'crud_obras_sociales.php';</script>"; // Redirige al listado
+    } else {
+        echo "<script>alert('Error al actualizar la obra social');</script>";
+    }
+
+    $stmt->close();
+}
+
+// Obtener el id_os de forma segura para mostrar los datos en el formulario
+$id_os = isset($_GET['id_cuenta']) ? intval($_GET['id_cuenta']) : 0;
+$stmt = $conexion->prepare("SELECT * FROM obras_sociales WHERE ID_OS = ?");
+$stmt->bind_param("i", $id_os);
 $stmt->execute();
 $result = $stmt->get_result();
-
-
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -69,16 +83,18 @@ $result = $stmt->get_result();
     <section id="contact" class="contact section">
       <div class="container-fluid row">
         <!-- Formulario de modificación -->
-        <form method="POST" action="crud_especialidades_modificar.php" class="col-4 p-3 m-auto">
-          <?php while ($datos = $result->fetch_object()) { ?>
+        <form method="POST" action="crud_obras_sociales_modificar.php" class="col-4 p-3 m-auto">
+          <?php if ($datos = $result->fetch_object()) { ?>
             <div class="mb-3">
-              <label for="id_cuenta" class="form-label">ID Especialidad</label>
-              <input type="text" class="form-control" name="id_cuenta" value="<?= $datos->ID_Especialidad ?>" readonly>
+              <label for="id_os" class="form-label">ID OS</label>
+              <input type="text" class="form-control" name="id_os" value="<?= $datos->ID_OS ?>" readonly>
             </div>
             <div class="mb-3">
               <label for="nombre" class="form-label">Nombre</label>
               <input type="text" class="form-control" name="nombre" value="<?= $datos->Nombre ?>">
             </div>
+          <?php } else { ?>
+            <p>No se encontró la obra social.</p>
           <?php } ?>
           <button type="submit" class="btn btn-primary" name="actualizar" value="ok">Actualizar</button>
         </form>
