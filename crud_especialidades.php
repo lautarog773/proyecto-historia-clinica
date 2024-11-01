@@ -32,23 +32,50 @@
 
 <body class="index-page">
 
-  <header id="header" class="header sticky-top">
-    <div class="branding d-flex align-items-center">
-      <div class="container position-relative d-flex align-items-center justify-content-between">
-        <a href="index.html" class="logo d-flex align-items-center me-auto">
-          <h1 class="sitename">Historia Clínica Digital</h1>
-        </a>
-        <nav id="navmenu" class="navmenu">
-          <ul>
-            <li><a href="logout.php">Cerrar Sesión</a></li>
-          </ul>
-          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-        </nav>
-      </div>
-    </div>
-  </header>
+<header id="header" class="header sticky-top">
 
-  <main class="main">
+<div class="topbar d-flex align-items-center">
+  <div class="container d-flex justify-content-center justify-content-md-between">
+    <div class="contact-info d-flex align-items-center">
+      <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:info@historiaclinica.com">info@historiaclinica.com</a></i>
+      <i class="bi bi-phone d-flex align-items-center ms-4"><span>+0800 555 2368</span></i>
+    </div>
+  </div>
+</div><!-- End Top Bar -->
+
+<div class="branding d-flex align-items-center">
+
+  <div class="container position-relative d-flex align-items-center justify-content-between">
+    <a href="index.php" class="logo d-flex align-items-center me-auto">
+      <!-- Uncomment the line below if you also wish to use an image logo -->
+      <!-- <img src="assets/img/logo.png" alt=""> -->
+      <h1 class="sitename">Historia Clínica Digital</h1>
+    </a>
+
+    <nav id="navmenu" class="navmenu">
+      <ul>
+        <li><a href="index.php">Inicio<br></a></li>
+        <li><a href="perfil.php">Mi Perfil</a></li>
+        <li><a href="consulta.php">Consultas</a></li>
+        <li class="dropdown"><a href="crud.php" class="active"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <ul>                
+            <li><a href="crud_especialidades.php">Especialidades</a></li>
+            <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
+            <li><a href="crud_cuentas.php">Cuentas</a></li>
+          </ul>
+        </li>
+        <li><a href="contact.php">Contacto</a></li>
+      </ul>
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </nav>
+
+    <a class="cta-btn d-none d-sm-block" href="login.php">Cerrar Sesión</a>
+
+  </div>
+
+</div>
+
+</header>
 
 
 
