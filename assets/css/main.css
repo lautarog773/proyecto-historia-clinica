@@ -865,7 +865,7 @@ section,
 --------------------------------------------------------------*/
 .section-title {
   text-align: center;
-  padding-bottom: 60px;
+  padding-bottom: 20px;
   position: relative;
 }
 
@@ -906,6 +906,9 @@ section,
 .section-title p {
   margin-bottom: 0;
 }
+
+
+
 
 /*--------------------------------------------------------------
 # Hero Section
@@ -1739,11 +1742,4 @@ section,
 }
 #actualizar-perfil:hover {
   background: color-mix(in srgb, var(--accent-color), transparent 20%);
-}
-
-/*--------------------------------------------------------------
-# Starter Section Section
---------------------------------------------------------------*/
-.starter-section {
-  /* Add your styles here */
 }

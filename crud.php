@@ -79,20 +79,15 @@
 
   <main class="main">
 
-    
     <section id="mi-perfil" class="section">
-      <div class="container">
- 
-    
+
     <!-- CRUD  -->
     <section id="services" class="services section">
 
-      <!-- Titulo -->
-      <div class="container section-title" data-aos="fade-up">
+      <div class="container">
+      <div class="section-title" data-aos="fade-up">
         <h2>CRUD</h2>
       </div>
-
-      <div class="container">
 
         <div class="row gy-4">
 
@@ -132,13 +127,13 @@
             </div>
           </div><!-- End Service Item -->
 
-          
         </div>
 
-      </div>
+        </div>
 
     </section><!-- /Services Section -->
 
+</main>
     
     <footer class="footer light-background">
     <div class="container copyright text-center">
