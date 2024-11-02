@@ -89,10 +89,10 @@
         <!-- Formulario de búsqueda -->
         <form method="GET" action="crud_especialidades.php" class="col-md-9 col-12 row gx-2">
           <div class="col-md-5 col-12 mb-2 mb-md-0">
-            <input type="text" class="form-control" name="id_especialidad" placeholder="ID Especialidad" value="<?php echo isset($_GET['id_especialidad']) ? $_GET['id_especialidad'] : ''; ?>">
+            <input type="text" class="form-control" name="id_especialidad" placeholder="🔍 ID Especialidad" value="<?php echo isset($_GET['id_especialidad']) ? $_GET['id_especialidad'] : ''; ?>">
           </div>
           <div class="col-md-5 col-12 mb-2 mb-md-0">
-            <input type="text" class="form-control" name="nombre" placeholder="Nombre" value="<?php echo isset($_GET['nombre']) ? $_GET['nombre'] : ''; ?>">
+            <input type="text" class="form-control" name="nombre" placeholder="🔍 Nombre" value="<?php echo isset($_GET['nombre']) ? $_GET['nombre'] : ''; ?>">
           </div>
           <div class="col-md-2 col-12">
             <button type="submit" class="btn btn-primary w-100" name="buscar" value="ok">Buscar</button>

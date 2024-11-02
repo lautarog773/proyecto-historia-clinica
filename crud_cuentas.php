@@ -88,17 +88,20 @@
 
         <!-- Formulario de búsqueda -->
         <form method="GET" action="crud_cuentas.php" class="col-md-9 col-12 row gx-2">
-          <div class="col-md-4 col-12 mb-2 mb-md-0">
-            <input type="text" class="form-control" name="id_cuenta" placeholder="ID Cuenta" value="<?php echo isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : ''; ?>">
+          <div class="col-md-3 col-12 mb-2 mb-md-0">
+            <input type="text" class="form-control" name="id_cuenta" placeholder="🔍 ID Cuenta" value="<?php echo isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : ''; ?>">
           </div>
-          <div class="col-md-4 col-12 mb-2 mb-md-0">
-            <input type="text" class="form-control" name="mail" placeholder="Mail" value="<?php echo isset($_GET['mail']) ? $_GET['mail'] : ''; ?>">
+          <div class="col-md-3 col-12 mb-2 mb-md-0">
+            <input type="text" class="form-control" name="buscador" placeholder="🔍 Nombre - Mail" value="<?php echo isset($_GET['buscador']) ? $_GET['buscador'] : ''; ?>">
           </div>
-          <div class="col-md-4 col-12">
+          <div class="col-md-3 col-12 mb-2 mb-md-0">
+            <input type="text" class="form-control" name="dni" placeholder="🔍 DNI" value="<?php echo isset($_GET['dni']) ? $_GET['dni'] : ''; ?>">
+          </div>
+          <div class="col-md-3 col-12">
             <button type="submit" class="btn btn-primary w-100" name="buscar" value="ok">Buscar</button>
           </div>
         </form>
-      </div>
+
 
       <!-- Tabla de resultados -->
       <div class="table-responsive">
@@ -106,45 +109,79 @@
           <thead class="bg-info text-white">
             <tr>
               <th scope="col">ID Cuenta</th>
-              <th scope="col">ID Tipo</th>
+              <th scope="col">Tipo</th>
               <th scope="col">Mail</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Apellido</th>
+              <th scope="col">DNI</th>
               <th scope="col">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <?php
-            include "conexion.php";
-            $id_cuenta = isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : '';
-            $mail = isset($_GET['mail']) ? $_GET['mail'] : '';
-            $query = "SELECT * FROM cuentas WHERE 1=1";
-            $params = [];
-            $types = "";
+              include "conexion.php";
+              $id_cuenta = isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : '';
+              $buscador = isset($_GET['buscador']) ? $_GET['buscador'] : '';
+              $dni = isset($_GET['dni']) ? $_GET['dni'] : '';
 
-            if (!empty($id_cuenta)) {
-                $query .= " AND ID_Cuenta LIKE ?";
-                $params[] = "%" . $id_cuenta . "%";
-                $types .= "s";
-            }
-            if (!empty($mail)) {
-                $query .= " AND Mail LIKE ?";
-                $params[] = "%" . $mail . "%";
-                $types .= "s";
-            }
+              $query = "SELECT 
+                          cuentas.ID_Cuenta, 
+                          cuentas.ID_Tipo, 
+                          tipos_cuentas.Descripcion AS Tipo, 
+                          cuentas.Mail,
+                          IFNULL(pacientes.Nombre, doctores.Nombre) AS Nombre,
+                          IFNULL(pacientes.Apellido, doctores.Apellido) AS Apellido,
+                          IFNULL(pacientes.DNI, doctores.DNI) AS DNI
+                        FROM cuentas
+                        LEFT JOIN tipos_cuentas ON cuentas.ID_Tipo = tipos_cuentas.ID_Tipo
+                        LEFT JOIN pacientes ON cuentas.ID_Paciente = pacientes.ID_Paciente
+                        LEFT JOIN doctores ON cuentas.ID_Profesional = doctores.ID_Profesional
+                        WHERE 1=1";
 
-            if (!empty($params)) {
-                $stmt = $conexion->prepare($query);
-                $stmt->bind_param($types, ...$params);
-                $stmt->execute();
-                $result = $stmt->get_result();
-            } else {
-                $result = $conexion->query($query);
-            }
+              $params = [];
+              $types = "";
+
+              // Filtro por ID Cuenta
+              if (!empty($id_cuenta)) {
+                  $query .= " AND cuentas.ID_Cuenta LIKE ?";
+                  $params[] = "%" . $id_cuenta . "%";
+                  $types .= "s";
+              }
+
+              // Filtro por buscador general (Nombre, Apellido, Mail)
+              if (!empty($buscador)) {
+                  $query .= " AND (pacientes.Nombre LIKE ? OR pacientes.Apellido LIKE ? OR doctores.Nombre LIKE ? OR doctores.Apellido LIKE ? OR cuentas.Mail LIKE ?)";
+                  $likeBuscador = "%" . $buscador . "%";
+                  $params = array_merge($params, array_fill(0, 5, $likeBuscador));
+                  $types .= str_repeat("s", 5);
+              }
+
+              // Filtro por DNI
+              if (!empty($dni)) {
+                  $query .= " AND (pacientes.DNI LIKE ? OR doctores.DNI LIKE ?)";
+                  $params[] = "%" . $dni . "%";
+                  $params[] = "%" . $dni . "%";
+                  $types .= "ss";
+              }
+
+              if (!empty($params)) {
+                  $stmt = $conexion->prepare($query);
+                  $stmt->bind_param($types, ...$params);
+                  $stmt->execute();
+                  $result = $stmt->get_result();
+              } else {
+                  $result = $conexion->query($query);
+              }
+
 
             while ($datos = $result->fetch_object()) { ?>
               <tr>
                 <td><?= $datos->ID_Cuenta ?></td>
-                <td><?= $datos->ID_Tipo ?></td>
+                <td><?= $datos->Tipo ?></td>
                 <td><?= $datos->Mail ?></td>
+                <td><?= $datos->Nombre ?></td> <!-- Mostrar Nombre -->
+                <td><?= $datos->Apellido ?></td> <!-- Mostrar Apellido -->
+                <td><?= $datos->DNI ?></td> <!-- Mostrar DNI -->
                 <td>
                   <a href="#" onclick="editRecord(<?= $datos->ID_Cuenta ?>, <?= $datos->ID_Tipo ?>, '<?= $datos->Mail ?>')" title="Editar" class="text-primary me-3">
                     <i class="fa-solid fa-user-pen"></i>
@@ -155,6 +192,7 @@
                 </td>
               </tr>
             <?php }
+            
             ?>
           </tbody>
         </table>
