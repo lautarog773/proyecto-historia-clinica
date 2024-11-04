@@ -99,36 +99,29 @@
           </div>
 
           <div class="col-lg-8">
-            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+            <form action="guardar_contacto.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
               <div class="row gy-4">
-
                 <div class="col-md-6">
                   <input type="text" name="name" class="form-control" placeholder="Nombre y apellido" required="">
                 </div>
-
                 <div class="col-md-6 ">
                   <input type="email" class="form-control" name="email" placeholder="Email" required="">
                 </div>
-
                 <div class="col-md-12">
                   <input type="text" class="form-control" name="subject" placeholder="Asunto" required="">
                 </div>
-
                 <div class="col-md-12">
                   <textarea class="form-control" name="message" rows="6" placeholder="Mensaje" required=""></textarea>
                 </div>
-
                 <div class="col-md-12 text-center">
                   <div class="loading">Enviando</div>
                   <div class="error-message"></div>
-                  <div class="sent-message">Si mensaje fue enviado, gracias!</div>
-
+                  <div class="sent-message">Su mensaje fue enviado, gracias!</div>
                   <button type="submit">Enviar Mensaje</button>
                 </div>
-
               </div>
             </form>
-          </div><!-- End Contact Form -->
+          </div>
 
         </div>
 
