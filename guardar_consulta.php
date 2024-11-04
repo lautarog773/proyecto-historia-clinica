@@ -2,8 +2,8 @@
 session_start();
 require 'conexion.php';
 
-// Simulación de autenticación (esto debería estar en tu código de autenticación)
-$_SESSION['ID_Cuenta'] = 5; // Donde $id_usuario es el ID del paciente o profesional que se autenticó.
+// TEST ONLY
+$_SESSION['ID_Cuenta'] = 30;
 
 // Verificar si el usuario es un doctor
 if (!isset($_SESSION['ID_Cuenta']) || !esDoctor($_SESSION['ID_Cuenta'], $conexion)) {
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_profesional = $_SESSION['ID_Profesional'];
     $fecha = $_POST['fecha'];
 
-
+    // Preparar la consulta SQL
     $sql = "INSERT INTO consultas_medicas (motivo, diagnostico, tratamiento, comentarios, ID_Paciente, ID_Profesional, fecha) VALUES ('$motivo', '$diagnostico', '$tratamiento', '$comentarios', $id_paciente, $id_profesional, '$fecha')";
 
     if (mysqli_query($conexion, $sql)) {
@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     mysqli_close($conexion);
-    header("Location: index.php");
+    header("Location: consulta.php");
     exit();
 
 

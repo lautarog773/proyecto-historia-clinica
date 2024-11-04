@@ -49,6 +49,7 @@
   scroll-behavior: smooth;
 }
 
+
 /*--------------------------------------------------------------
 # General Styling & Shared Classes
 --------------------------------------------------------------*/
@@ -865,7 +866,7 @@ section,
 --------------------------------------------------------------*/
 .section-title {
   text-align: center;
-  padding-bottom: 60px;
+  padding-bottom: 20px;
   position: relative;
 }
 
@@ -906,6 +907,9 @@ section,
 .section-title p {
   margin-bottom: 0;
 }
+
+
+
 
 /*--------------------------------------------------------------
 # Hero Section
@@ -1741,9 +1745,12 @@ section,
   background: color-mix(in srgb, var(--accent-color), transparent 20%);
 }
 
-/*--------------------------------------------------------------
-# Starter Section Section
---------------------------------------------------------------*/
-.starter-section {
-  /* Add your styles here */
+.header-consulta {
+  background-color: #007bff;
+  color: white;
+}
+
+.header-estudio {
+  background-color: #28a745;
+  color: white;
 }

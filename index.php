@@ -3,8 +3,8 @@ session_start();
 
 require 'conexion.php';
 
- //TEST ONLY
-$_SESSION['ID_Cuenta'] = 4;
+// TEST ONLY
+//$_SESSION['ID_Cuenta'] = 4;
 
 
 // Verifica si el usuario está autenticado
@@ -12,80 +12,6 @@ if (!isset($_SESSION['ID_Cuenta'])) {
   header("Location: login.php");
   exit();
 }
-
-// Obtener información del usuario
-$id_cuenta = $_SESSION['ID_Cuenta'];
-
-// Consulta para obtener el nombre del usuario
-$sql = "SELECT c.ID_tipo, p.Nombre AS nombre_paciente, d.Nombre AS nombre_medico
-        FROM cuentas c
-        LEFT JOIN pacientes p ON c.ID_Paciente = p.ID_Paciente
-        LEFT JOIN doctores d ON c.ID_Profesional = d.ID_Profesional
-        WHERE ID_Cuenta = $id_cuenta";
-
-// Ejecuta la consulta
-$result = $conexion->query($sql);
-
-
-if ($result->num_rows > 0) {
-  $usuario = $result->fetch_assoc();
-  $tipo_usuario = $usuario['ID_tipo'];
-
-
-  if ($tipo_usuario == 1) {
-    $nombre_usuario = $usuario['nombre_paciente'];
-  } elseif ($tipo_usuario == 2) {
-    $nombre_usuario = $usuario['nombre_medico'];
-  }
-} else {
-  // Si no se encuentra el usuario, redirigir a login
-  header("Location: login.php");
-  exit();
-}
-
-
-// Consulta para obtener las consultas médicas del paciente
-$sql_consultas = "SELECT d.id_profesional as id_doctor, d.nombre as nombre_doctor, d.apellido as apellido_doctor,
-                  cm.Motivo as motivo, cm.Tratamiento as tratamiento, cm.Diagnostico as diagnostico,
-                  cm.Comentarios as comentarios, cm.Fecha as fecha, e.Nombre as especialidad, e.ID_Especialidad as id_especialidad
-                  FROM consultas_medicas cm
-                  LEFT JOIN cuentas c ON c.ID_Paciente = cm.ID_Paciente
-                  LEFT JOIN pacientes p ON c.ID_Paciente = p.ID_Paciente
-                  LEFT JOIN doctores d ON cm.ID_Profesional = d.ID_Profesional
-                  LEFT JOIN especialidades e ON d.ID_Especialidad = e.ID_Especialidad
-                  WHERE c.ID_Cuenta = $id_cuenta
-                  ORDER BY cm.Fecha DESC";
-
-// Obtener los doctores y especialidades para los filtros
-$query_doctores = "SELECT ID_Profesional, nombre, apellido FROM doctores";
-$result_doctores = $conexion->query($query_doctores);
-
-$query_especialidad = "SELECT ID_Especialidad, nombre FROM especialidades";
-$result_especialidad = $conexion->query($query_especialidad);
-
-
-// Ejecutar la consulta
-$result_consultas = $conexion->query($sql_consultas);
-
-
-
-
-// Obtener los pacientes para el desplegable
-$sql_pacientes = "SELECT ID_Paciente, nombre, apellido FROM pacientes";
-$result_pacientes = $conexion->query($sql_pacientes);
-
-if ($result_pacientes === false) {
-  die("Error al obtener los pacientes: " . $conexion->error);
-}
-
-$consulta_result = '';
-if (isset($_SESSION['consulta_result'])) {
-  $consulta_result = $_SESSION['consulta_result'];
-  unset($_SESSION['consulta_result']);
-}
-
-
-
 
 ?>
 
@@ -106,7 +32,7 @@ if (isset($_SESSION['consulta_result'])) {
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -124,275 +50,391 @@ if (isset($_SESSION['consulta_result'])) {
 <body class="index-page">
 
   <header id="header" class="header sticky-top">
+
     <div class="branding d-flex align-items-center">
+
       <div class="container position-relative d-flex align-items-center justify-content-between">
         <a href="index.php" class="logo d-flex align-items-center me-auto">
+          <!-- Uncomment the line below if you also wish to use an image logo -->
+          <!-- <img src="assets/img/logo.png" alt=""> -->
           <h1 class="sitename">Historia Clínica Digital</h1>
         </a>
+
         <nav id="navmenu" class="navmenu">
           <ul>
-            <li><a href="index.php" class="active">Inicio</a></li>
-            <li><a href="perfil.php">Perfil</a></li>
+            <li><a href="index.php" class="active">Inicio<br></a></li>
+            <li><a href="perfil.php">Mi Perfil</a></li>
+            <li><a href="consulta.php">Consultas</a></li>
+            <li class="dropdown"><a href="crud.php"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+              <ul>
+                <li><a href="crud_especialidades.php">Especialidades</a></li>
+                <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
+                <li><a href="crud_cuentas.php">Cuentas</a></li>
+              </ul>
+            </li>
             <li><a href="contact.php">Contacto</a></li>
-            <li><a href="logout.php">Cerrar Sesión</a></li>
           </ul>
-
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
+
+        <a class="cta-btn d-none d-sm-block" href="login.php">Cerrar Sesión</a>
+
       </div>
+
     </div>
+
   </header>
 
   <main class="main">
-    <section id="principal" class="hero section light-background">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section light-background">
+
+      <img src="assets/img/hero-bg.jpg" alt="" data-aos="fade-in">
+
       <div class="container position-relative">
 
-      <!-- Mensaje de bienvenida -->
-        <div class="welcome position-relative text-center mb-4" data-aos="fade-down" data-aos-delay="100">
-          <h2>Bienvenido, <?php echo $nombre_usuario; ?></h2>
-          <?php if ($tipo_usuario == 1) : ?>
-            <p>Aquí puedes revisar tus consultas médicas.</p>
-          <?php elseif ($tipo_usuario == 2) : ?>
-            <p>Aquí puedes gestionar y revisar la información de tus pacientes.</p>
-          <?php endif; ?>
-        </div>
+        <div class="welcome position-relative" data-aos="fade-down" data-aos-delay="100">
+          <h2>MI HISTORIA CLÍNICA</h2>
+          <p>Toda tu información médica en un solo lugar</p>
+        </div><!-- End Welcome -->
 
-
-        <!-- paciente -->
-        <?php if ($tipo_usuario == 1) : ?>
-          <div class="col-lg-12 d-flex flex-column align-items-center">
-            <h4 class="mb-4">Consultas Médicas</h4>
-
-
-            <!-- Formulario de búsqueda -->
-            <div class="mb-4">
-              <form id="busqueda-form" method="GET" action="" class="row g-2 align-items-center">
-
-                <!-- Campo de búsqueda por motivo -->
-                <div class="col-md-2">
-                  <label for="motivo" class="form-label">Motivo</label>
-                  <input type="text" class="form-control" placeholder="Motivo" name="motivo" id="motivo" aria-label="Buscar por motivo">
-                </div>
-
-                <!-- Selección de Doctor -->
-                <div class="col-md-2">
-                  <label for="doctor" class="form-label">Doctor</label>
-                  <select class="form-select" id="doctor" name="doctor">
-                    <option value="">Seleccionar</option>
-                    <?php while ($doctor = $result_doctores->fetch_assoc()) : ?>
-                      <option value="<?php echo $doctor['ID_Profesional']; ?>">
-                        <?php echo $doctor['nombre'] . ' ' . $doctor['apellido']; ?>
-                      </option>
-                    <?php endwhile; ?>
-                  </select>
-                </div>
-
-                <!-- Selección de Especialidad -->
-                <div class="col-md-2">
-                  <label for="especialidad" class="form-label">Especialidad</label>
-                  <select class="form-select" id="especialidad" name="especialidad">
-                    <option value="">Seleccionar</option>
-                    <?php while ($especialidad = $result_especialidad->fetch_assoc()) : ?>
-                      <option value="<?php echo $especialidad['ID_Especialidad']; ?>">
-                        <?php echo $especialidad['nombre']; ?>
-                      </option>
-                    <?php endwhile; ?>
-                  </select>
-                </div>
-
-                <!-- Campo de Fecha Desde -->
-                <div class="col-md-2">
-                  <label for="fecha_d" class="form-label">Fecha Desde</label>
-                  <input type="date" class="form-control" name="fecha_d" id="fecha_d">
-                </div>
-
-                <!-- Campo de Fecha Hasta -->
-                <div class="col-md-2">
-                  <label for="fecha_h" class="form-label">Fecha Hasta</label>
-                  <input type="date" class="form-control" name="fecha_h" id="fecha_h">
-                </div>
-
-                <!-- Botón de búsqueda -->
-                <div class="col-auto d-flex align-items-end">
-                  <button type="submit" class="btn btn-primary rounded-circle">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-
-              </form>
+        <div class="content row gy-4">
+          <div class="col-lg-4 d-flex align-items-stretch">
+            <div class="why-box" data-aos="zoom-out" data-aos-delay="200">
+              <h3>¿Qué es Historia Clínica Digital?</h3>
+              <p>
+                La Historia Clínica Digital es un sistema integral que permite a los pacientes y profesionales de la salud acceder y gestionar la información médica de forma segura y eficiente. Nuestro objetivo es mejorar la calidad de la atención y facilitar la comunicación entre todos los actores del sistema de salud.
+              </p>
+              <div class="text-center">
+                <a href="#about" class="more-btn"><span>Conocé Más</span> <i class="bi bi-chevron-right"></i></a>
+              </div>
             </div>
+          </div><!-- End Why Box -->
 
+          <div class="col-lg-8 d-flex align-items-stretch">
+            <div class="d-flex flex-column justify-content-center">
+              <div class="row gy-4">
 
-
-            <!-- Listado de consultas -->
-            <div class="row col-md-12"> 
-              <?php              
-              $motivo_busqueda = isset($_GET['motivo']) ? $_GET['motivo'] : '';
-              $doctor_busqueda = isset($_GET['doctor']) ? $_GET['doctor'] : '';
-              $especialidad_busqueda = isset($_GET['especialidad']) ? $_GET['especialidad'] : '';
-              $fecha_d = isset($_GET['fecha_d']) ? $_GET['fecha_d'] : '';
-              $fecha_h = isset($_GET['fecha_h']) ? $_GET['fecha_h'] : '';
-              while ($consulta = $result_consultas->fetch_assoc()) :
-                $motivo_valido = empty($motivo_busqueda) || stripos($consulta['motivo'], $motivo_busqueda) !== false;
-                $doctor_valido = empty($doctor_busqueda) || $consulta['id_doctor'] == $doctor_busqueda;
-                $especialidad_valido = empty($especialidad_busqueda) || $consulta['id_especialidad'] == $especialidad_busqueda;
-                $fecha_valido = (empty($fecha_d) || $consulta['fecha'] >= $fecha_d) && (empty($fecha_h) || $consulta['fecha'] <= $fecha_h);
-
-                if ($motivo_valido && $doctor_valido && $especialidad_valido && $fecha_valido) :
-              ?>
-                  <div class="col-md-4 mb-3">
-                    <div class="card">
-                      <h5 class="card-header"><?php echo ($consulta['motivo']); ?></h5>
-                      <div class="card-body">
-                        <h5 class="card-title"><?php echo ($consulta['apellido_doctor'] . ' ' . $consulta['nombre_doctor']) . ' - ' . $consulta['especialidad']; ?></h5>
-                        <p class="card-text"><?php echo ($consulta['fecha']); ?></p>
-                        <a href="#" class="btn btn-primary ver-detalles"
-                          data-motivo="<?php echo ($consulta['motivo']); ?>"
-                          data-doctor="<?php echo ($consulta['apellido_doctor'] . ' ' . $consulta['nombre_doctor']); ?>"
-                          data-especialidad="<?php echo ($consulta['especialidad']); ?>"
-                          data-fecha="<?php echo ($consulta['fecha']); ?>"
-                          data-diagnostico="<?php echo ($consulta['diagnostico']); ?>"
-                          data-tratamiento="<?php echo ($consulta['tratamiento']); ?>"
-                          data-comentarios="<?php echo ($consulta['comentarios']); ?>">Ver Detalles</a>
-                      </div>
-                    </div>
+                <div class="col-xl-4 d-flex align-items-stretch">
+                  <div class="icon-box" data-aos="zoom-out" data-aos-delay="300">
+                    <i class="bi bi-clipboard-data"></i>
+                    <h4>Protección de Datos</h4>
+                    <p>Cumplimos con los más altos estándares de seguridad y protección de datos médicos.</p>
                   </div>
-              <?php
-                endif;
-              endwhile; ?>
-            </div>
+                </div><!-- End Icon Box -->
 
-          </div>
+                <div class="col-xl-4 d-flex align-items-stretch">
+                  <div class="icon-box" data-aos="zoom-out" data-aos-delay="400">
+                    <i class="bi bi-gem"></i>
+                    <h4>Accesibilidad</h4>
+                    <p>Accede a tus informes, resultados y antecedentes en cualquier momento y lugar.</p>
+                  </div>
+                </div><!-- End Icon Box -->
 
+                <div class="col-xl-4 d-flex align-items-stretch">
+                  <div class="icon-box" data-aos="zoom-out" data-aos-delay="500">
+                    <i class="bi bi-inboxes"></i>
+                    <h4>Interoperabilidad</h4>
+                    <p>Integración con múltiples sistemas para asegurar un flujo de información continuo y eficiente.</p>
+                  </div>
+                </div><!-- End Icon Box -->
 
-
-
-        <!-- Doctor -->
-        <?php elseif ($tipo_usuario == 2) : ?>
-
-          <!-- Formulario para ingresar nuevas consultas -->
-          <div class="col-lg-12 d-flex flex-column align-items-center">
-            <h4>Registrar Nueva Consulta</h4>
-            <div class="col-lg-6 mt-4 card p-4">
-              <form id="form-nueva-consulta" method="POST" action="guardar_consulta.php">
-                <div class="mb-3">
-                  <label for="motivo" class="form-label">Motivo de la Consulta</label>
-                  <input type="text" class="form-control" id="motivo" name="motivo" required>
-                </div>
-                <div class="mb-3">
-                  <label for="fecha" class="form-label">Fecha</label>
-                  <input type="date" class="form-control" id="fecha" name="fecha" required>
-                </div>
-                <div class="mb-3">
-                  <label for="paciente" class="form-label">Seleccione el Paciente</label>
-                  <select class="form-select" id="paciente" name="id_paciente" required>
-                    <option value="">Seleccione un paciente</option>
-                    <?php while ($paciente = $result_pacientes->fetch_assoc()) : ?>
-                      <option value="<?php echo $paciente['ID_Paciente']; ?>">
-                        <?php echo $paciente['nombre'] . ' ' . $paciente['apellido']; ?>
-                      </option>
-                    <?php endwhile; ?>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="diagnostico" class="form-label">Diagnóstico</label>
-                  <input type="text" class="form-control" id="diagnostico" name="diagnostico" required>
-                </div>
-                <div class="mb-3">
-                  <label for="tratamiento" class="form-label">Tratamiento</label>
-                  <input type="text" class="form-control" id="tratamiento" name="tratamiento" required>
-                </div>
-                <div class="mb-3">
-                  <label for="comentarios" class="form-label">Comentarios</label>
-                  <textarea class="form-control" id="comentarios" name="comentarios" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success">Registrar Consulta</button>
-              </form>
+              </div>
             </div>
           </div>
+        </div><!-- End  Content-->
 
-        <?php endif; ?>
       </div>
 
-    </section>
+    </section><!-- /Hero Section -->
 
+
+
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+      <div class="container">
+
+        <div class="row gy-4 gx-5">
+
+          <div class="col-lg-6 position-relative align-self-start" data-aos="fade-up" data-aos-delay="200">
+            <img src="assets/img/about.jpg" class="img-fluid" alt="">
+          </div>
+
+          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
+            <h3>Sobre nosotros</h3>
+            <p>
+              La Historia Clínica Digital es una plataforma innovadora diseñada para optimizar la gestión de la información médica.
+              Nuestro objetivo es proporcionar a pacientes y profesionales de la salud un acceso seguro y eficiente a los datos clínicos.
+              Facilitar el intercambio de información entre diferentes proveedores de salud es esencial para mejorar la atención y los resultados clínicos.</p>
+            <ul>
+              <li>
+                <i class="fa-solid fa-vial-circle-check"></i>
+                <div>
+                  <h5>Mejora en la eficiencia de los servicios de salud </h5>
+                  <p>La digitalización de los registros médicos permite un flujo de información más ágil, reduciendo los tiempos de espera y optimizando los procesos administrativos.</p>
+                </div>
+              </li>
+              <li>
+                <i class="fa-solid fa-pump-medical"></i>
+                <div>
+                  <h5>Acceso centralizado a la información médica
+                  </h5>
+                  <p>Los profesionales pueden consultar el historial clínico de los pacientes de manera rápida, garantizando una atención más informada y personalizada.</p>
+                </div>
+              </li>
+              <li>
+                <i class="fa-solid fa-heart-circle-xmark"></i>
+                <div>
+                  <h5>Fortalecimiento de la colaboración interprofesional
+                  </h5>
+                  <p>Fomentamos la comunicación entre diferentes especialistas para asegurar un enfoque integral en el tratamiento y seguimiento de los pacientes.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /About Section -->
+
+    <!-- Stats Section -->
+    <section id="stats" class="stats section light-background">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+            <i class="fa-solid fa-user-doctor"></i>
+            <div class="stats-item">
+              <span data-purecounter-start="0" data-purecounter-end="8" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Profesionales</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+            <i class="fa-regular fa-hospital"></i>
+            <div class="stats-item">
+              <span data-purecounter-start="0" data-purecounter-end="5" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Especialidades</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+            <i class="fas fa-flask"></i>
+            <div class="stats-item">
+              <span data-purecounter-start="0" data-purecounter-end="12" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Estudios</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+          <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+            <i class="fas fa-award"></i>
+            <div class="stats-item">
+              <span data-purecounter-start="0" data-purecounter-end="150" data-purecounter-duration="1" class="purecounter"></span>
+              <p>Awards</p>
+            </div>
+          </div><!-- End Stats Item -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Stats Section -->
+
+    <!-- Departments Section -->
+    <section id="departments" class="departments section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Especialidades</h2>
+        <p>Nuestra red de servicios abarca diversas especialidades médicas, garantizando una atención de calidad en todas las áreas.
+
+        </p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row">
+          <div class="col-lg-3">
+            <ul class="nav nav-tabs flex-column">
+              <li class="nav-item">
+                <a class="nav-link active show" data-bs-toggle="tab" href="#departments-tab-1">Cardiología</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#departments-tab-2">Neurología</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#departments-tab-3">Traumatología</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#departments-tab-4">Pediatría</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#departments-tab-5">Oftalmología</a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-9 mt-4 mt-lg-0">
+            <div class="tab-content">
+              <div class="tab-pane active show" id="departments-tab-1">
+                <div class="row">
+                  <div class="col-lg-8 details order-2 order-lg-1">
+                    <h3>Cardiología</h3>
+                    <p class="fst-italic">La Cardiología se dedica al diagnóstico y tratamiento de enfermedades del corazón y el sistema circulatorio. Nuestro equipo de cardiólogos trabaja con tecnología avanzada para ofrecer cuidados personalizados.</p>
+                    <p>La salud cardiovascular es fundamental para el bienestar general. Nuestros especialistas están comprometidos en proporcionar tratamientos efectivos y en la prevención de enfermedades cardíacas.</p>
+                  </div>
+                  <div class="col-lg-4 text-center order-1 order-lg-2">
+                    <img src="assets/img/departments-1.jpg" alt="" class="img-fluid">
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="departments-tab-2">
+                <div class="row">
+                  <div class="col-lg-8 details order-2 order-lg-1">
+                    <h3>Neurología</h3>
+                    <p class="fst-italic">La Neurología abarca el diagnóstico y tratamiento de trastornos del sistema nervioso. Contamos con un equipo de expertos en el manejo de condiciones neurológicas complejas.</p>
+                    <p>Nos enfocamos en ofrecer un diagnóstico preciso y un plan de tratamiento adaptado a las necesidades del paciente, utilizando técnicas avanzadas y un enfoque multidisciplinario.</p>
+                  </div>
+                  <div class="col-lg-4 text-center order-1 order-lg-2">
+                    <img src="assets/img/departments-2.jpg" alt="" class="img-fluid">
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="departments-tab-3">
+                <div class="row">
+                  <div class="col-lg-8 details order-2 order-lg-1">
+                    <h3>Traumatología</h3>
+                    <p class="fst-italic">La Traumatología se especializa en el tratamiento de lesiones y trastornos musculoesqueléticos. Nuestro equipo está capacitado para manejar desde lesiones deportivas hasta traumas complejos.</p>
+                    <p>Brindamos atención integral y una rehabilitación adecuada para asegurar la mejor recuperación posible, priorizando siempre la salud y bienestar del paciente.</p>
+                  </div>
+                  <div class="col-lg-4 text-center order-1 order-lg-2">
+                    <img src="assets/img/departments-3.jpg" alt="" class="img-fluid">
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="departments-tab-4">
+                <div class="row">
+                  <div class="col-lg-8 details order-2 order-lg-1">
+                    <h3>Pediatría</h3>
+                    <p class="fst-italic">La Pediatría se enfoca en la atención médica de los más jóvenes, desde recién nacidos hasta adolescentes. Nuestro objetivo es promover la salud infantil y garantizar un desarrollo óptimo.</p>
+                    <p>Ofrecemos un ambiente acogedor y profesional, donde los padres pueden confiar en que sus hijos recibirán la mejor atención posible en cada etapa de su crecimiento.</p>
+                  </div>
+                  <div class="col-lg-4 text-center order-1 order-lg-2">
+                    <img src="assets/img/departments-4.jpg" alt="" class="img-fluid">
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="departments-tab-5">
+                <div class="row">
+                  <div class="col-lg-8 details order-2 order-lg-1">
+                    <h3>Oftalmología</h3>
+                    <p class="fst-italic">La Oftalmología se dedica a la salud ocular, diagnosticando y tratando problemas visuales. Nuestros oftalmólogos utilizan tecnología de vanguardia para ofrecer soluciones efectivas.</p>
+                    <p>Desde exámenes de rutina hasta cirugías complejas, estamos comprometidos en mejorar la salud visual de nuestros pacientes con un enfoque en la prevención y la educación.</p>
+                  </div>
+                  <div class="col-lg-4 text-center order-1 order-lg-2">
+                    <img src="assets/img/departments-5.jpg" alt="" class="img-fluid">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /Departments Section -->
+
+    <!-- Faq Section -->
+    <section id="faq" class="faq section light-background">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Preguntas Frecuentes</h2>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row justify-content-center">
+
+          <div class="col-lg-10" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="faq-container">
+
+              <div class="faq-item">
+                <h3>¿Qué es Historia Clínica Digital?
+                </h3>
+                <div class="faq-content">
+                  <p>Historia Clínica Digital es una herramienta diseñada para centralizar y facilitar el acceso a la información médica de los pacientes, asegurando una atención más efectiva y coordinada en todo el país.</p>
+                </div>
+                <i class="faq-toggle bi bi-chevron-right"></i>
+              </div><!-- End Faq item-->
+
+              <div class="faq-item">
+                <h3>¿Cuál es el rol del médico en el uso de Historia Clínica Digital?
+                </h3>
+                <div class="faq-content">
+                  <p>El médico se encarga de documentar exhaustivamente cada consulta y procedimiento en el sistema, permitiendo que otros profesionales tengan acceso al historial médico del paciente en cualquier momento.
+
+                  </p>
+                </div>
+                <i class="faq-toggle bi bi-chevron-right"></i>
+              </div><!-- End Faq item-->
+
+              <div class="faq-item">
+                <h3>¿Qué papel juegan los ciudadanos en Historia Clínica Digital?
+                </h3>
+                <div class="faq-content">
+                  <p>Los ciudadanos son fundamentales en este sistema, ya que tienen el control sobre quién puede acceder a su información médica, asegurando así su privacidad y confianza en el sistema de salud.
+
+                  </p>
+                </div>
+                <i class="faq-toggle bi bi-chevron-right"></i>
+              </div><!-- End Faq item-->
+
+              <div class="faq-item">
+                <h3>¿Cómo se garantiza la privacidad de la información en Historia Clínica Digital?
+                </h3>
+                <div class="faq-content">
+                  <p>Se implementan estrictas políticas de seguridad que limitan el acceso a información sensible solo a personal autorizado y que requieren consentimiento del paciente para el intercambio de datos.
+
+                  </p>
+                </div>
+                <i class="faq-toggle bi bi-chevron-right"></i>
+              </div><!-- End Faq item-->
+
+              <div class="faq-item">
+                <h3>¿Por qué es importante la digitalización de los registros médicos?
+                </h3>
+                <div class="faq-content">
+                  <p>La digitalización es crucial para la mejora continua del sistema de salud, ya que permite a los pacientes y profesionales acceder a información en tiempo real, favoreciendo una toma de decisiones más efectiva y una atención más coordinada.
+
+                  </p>
+                </div>
+                <i class="faq-toggle bi bi-chevron-right"></i>
+              </div><!-- End Faq item-->
+
+            </div>
+
+          </div><!-- End Faq Column-->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Faq Section -->
   </main>
-
 
   <footer class="footer light-background">
     <div class="container copyright text-center">
       <p>© 2024 <strong class="px-1 sitename">Historia Clinica Digital</strong> <span>Todos los derechos reservados </span></p>
     </div>
   </footer>
-
-  <!-- Modal Detalle -->
-  <div class="modal fade" id="consultaModal" tabindex="-1" aria-labelledby="consultaModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="consultaModalLabel">Detalles de la Consulta</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <table class="table">
-            <tbody>
-              <tr>
-                <th>Motivo</th>
-                <td id="modal-motivo"></td>
-              </tr>
-              <tr>
-                <th>Doctor</th>
-                <td id="modal-doctor"></td>
-              </tr>
-              <tr>
-                <th>Especialidad</th>
-                <td id="modal-especialidad"></td>
-              </tr>
-              <tr>
-                <th>Fecha</th>
-                <td id="modal-fecha"></td>
-              </tr>
-              <tr>
-                <th>Diagnóstico</th>
-                <td id="modal-diagnostico"></td>
-              </tr>
-              <tr>
-                <th>Tratamiento</th>
-                <td id="modal-tratamiento"></td>
-              </tr>
-              <tr>
-                <th>Comentarios</th>
-                <td id="modal-comentarios"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Resultado -->
-  <div class="modal fade" id="resultadoModal" tabindex="-1" aria-labelledby="resultadoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="resultadoModalLabel">Resultado de la Consulta</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p id="mensajeResultado"><?php echo $consulta_result; ?></p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
 
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
@@ -411,55 +453,6 @@ if (isset($_SESSION['consulta_result'])) {
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const botonesDetalles = document.querySelectorAll('.ver-detalles');
-
-      botonesDetalles.forEach(boton => {
-        boton.addEventListener('click', function(event) {
-          event.preventDefault();
-
-          // Obtener los datos del botón
-          const motivo = this.getAttribute('data-motivo');
-          const doctor = this.getAttribute('data-doctor');
-          const especialidad = this.getAttribute('data-especialidad');
-          const fecha = this.getAttribute('data-fecha');
-          const diagnostico = this.getAttribute('data-diagnostico');
-          const tratamiento = this.getAttribute('data-tratamiento');
-          const comentarios = this.getAttribute('data-comentarios');
-
-          // Asignar los datos al modal
-          document.getElementById('modal-motivo').textContent = motivo;
-          document.getElementById('modal-doctor').textContent = doctor;
-          document.getElementById('modal-especialidad').textContent = especialidad;
-          document.getElementById('modal-fecha').textContent = fecha;
-          document.getElementById('modal-diagnostico').textContent = diagnostico;
-          document.getElementById('modal-tratamiento').textContent = tratamiento;
-          document.getElementById('modal-comentarios').textContent = comentarios;
-
-          // Abrir el modal
-          const modal = new bootstrap.Modal(document.getElementById('consultaModal'));
-          modal.show();
-        });
-      });
-    });
-  </script>
-
-  <script>
-    // Mostrar el modal si hay un resultado de la consulta
-    document.addEventListener('DOMContentLoaded', function() {
-      <?php if (!empty($consulta_result)) : ?>
-        var myModal = new bootstrap.Modal(document.getElementById('resultadoModal'));
-        myModal.show();
-      <?php endif; ?>
-    });
-  </script>
-
-
 </body>
 
 </html>
-
-<?php
-$conexion->close();
-?>
