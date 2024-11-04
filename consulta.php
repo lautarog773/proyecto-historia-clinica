@@ -4,7 +4,7 @@ session_start();
 require 'conexion.php';
 
 // TEST ONLY
-//$_SESSION['ID_Cuenta'] = 2;
+$SESSION['ID_Cuenta'] = 30;
 
 
 // Verifica si el usuario está autenticado
@@ -306,7 +306,7 @@ unset($_SESSION['tab_activa']);
                           <p class="card-text"><?php echo ($estudio['especialidad']) . ' - ' . ($estudio['Fecha']); ?></p>
                           <p class="card-text"><?php echo ($estudio['Informe']); ?></p>
                           <?php if (!empty($estudio['Imagenes'])) : ?>
-                            <a href="<?php echo htmlspecialchars($estudio['Imagenes']); ?>" target="_blank" class="btn btn-link">Ver Imagen</a>
+                            <a href="<?php echo ($estudio['Imagenes']); ?>" target="_blank" class="btn btn-link">Ver Imagen</a>
                           <?php else : ?>
                             <a href="#" class="btn btn-link disabled" tabindex="-1" aria-disabled="true">No hay imagen asociada</a>
                           <?php endif; ?>
@@ -430,7 +430,7 @@ unset($_SESSION['tab_activa']);
                       <option value="">Seleccione un paciente</option>
                       <?php while ($paciente = $historial_pacientes->fetch_assoc()) : ?>
                         <option value="<?php echo $paciente['ID_Paciente']; ?>">
-                          <?php echo htmlspecialchars($paciente['nombre'] . ' ' . $paciente['apellido']); ?>
+                          <?php echo ($paciente['nombre'] . ' ' . $paciente['apellido']); ?>
                         </option>
                       <?php endwhile; ?>
                     </select>
@@ -450,22 +450,22 @@ unset($_SESSION['tab_activa']);
                         <?php foreach ($historial_consultas as $consulta): ?>
                           <div class="col-md-4 mb-3">
                             <div class="card">
-                              <h5 class="card-header"><?php echo htmlspecialchars($consulta['motivo']); ?></h5>
+                              <h5 class="card-header header-consulta"><?php echo '#' . ($consulta['id_consulta']) . ' - ' .($consulta['motivo']); ?></h5>
                               <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($consulta['diagnostico']); ?></h5>
+                                <h5 class="card-title"><?php echo ($consulta['diagnostico']); ?></h5>
                                 <p class="card-text">
-                                  <strong>Fecha:</strong> <?php echo htmlspecialchars($consulta['fecha']); ?><br>
-                                  <strong>Tratamiento:</strong> <?php echo htmlspecialchars($consulta['tratamiento']); ?><br>
-                                  <strong>Comentarios:</strong> <?php echo htmlspecialchars($consulta['comentarios']); ?>
+                                  <strong>Fecha:</strong> <?php echo ($consulta['fecha']); ?><br>
+                                  <strong>Tratamiento:</strong> <?php echo ($consulta['tratamiento']); ?><br>
+                                  <strong>Comentarios:</strong> <?php echo ($consulta['comentarios']); ?>
                                 </p>
                                 <a href="#" class="btn btn-primary ver-detalles"
-                                  data-motivo="<?php echo htmlspecialchars($consulta['motivo']); ?>"
-                                  data-doctor="<?php echo htmlspecialchars($consulta['apellido_doctor'] . ' ' . $consulta['nombre_doctor']); ?>"
-                                  data-especialidad="<?php echo htmlspecialchars($consulta['especialidad']); ?>"
-                                  data-fecha="<?php echo htmlspecialchars($consulta['fecha']); ?>"
-                                  data-diagnostico="<?php echo htmlspecialchars($consulta['diagnostico']); ?>"
-                                  data-tratamiento="<?php echo htmlspecialchars($consulta['tratamiento']); ?>"
-                                  data-comentarios="<?php echo htmlspecialchars($consulta['comentarios']); ?>">Ver Detalles</a>
+                                  data-motivo="<?php echo ($consulta['motivo']); ?>"
+                                  data-doctor="<?php echo ($consulta['apellido_doctor'] . ' ' . $consulta['nombre_doctor']); ?>"
+                                  data-especialidad="<?php echo ($consulta['especialidad']); ?>"
+                                  data-fecha="<?php echo ($consulta['fecha']); ?>"
+                                  data-diagnostico="<?php echo ($consulta['diagnostico']); ?>"
+                                  data-tratamiento="<?php echo ($consulta['tratamiento']); ?>"
+                                  data-comentarios="<?php echo ($consulta['comentarios']); ?>">Ver Detalles</a>
                               </div>
                             </div>
                           </div>
@@ -482,14 +482,16 @@ unset($_SESSION['tab_activa']);
                         <?php foreach ($historial_estudios as $estudio): ?>
                           <div class="col-md-4 mb-3">
                             <div class="card">
-                              <h5 class="card-header"><?php echo htmlspecialchars($estudio['especialidad']); ?></h5>
+                              <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#'. $estudio['id_consulta'] . ' - ' . $estudio['motivo']); ?></h5>
+                              
                               <div class="card-body">
                                 <p class="card-text">
-                                  <strong>Fecha:</strong> <?php echo htmlspecialchars($estudio['Fecha']); ?><br>
-                                  <strong>Informe:</strong> <?php echo htmlspecialchars($estudio['Informe']); ?><br>
+                                  <strong>Especialidad:</strong> <?php echo ($estudio['especialidad']); ?><br>
+                                  <strong>Fecha:</strong> <?php echo ($estudio['Fecha']); ?><br>
+                                  <strong>Informe:</strong> <?php echo ($estudio['Informe']); ?><br>
                                   <strong>Imagen:</strong>
                                   <?php if (!empty($estudio['Imagenes'])): ?>
-                                    <a href="<?php echo htmlspecialchars($estudio['Imagenes']); ?>" target="_blank">Ver Imagen</a>
+                                    <a href="<?php echo ($estudio['Imagenes']); ?>" target="_blank">Ver Imagen</a>
                                   <?php else: ?>
                                     Sin imagen
                                   <?php endif; ?>

@@ -65,7 +65,7 @@ $_SESSION['historial_consultas'] = $historial_consultas;
 
 // Consulta para obtener los estudios médicos del paciente
 
-$sql_estudios = "SELECT em.Fecha, es.nombre AS especialidad, em.Imagenes, em.Informe, cm.id_consulta AS id_consulta
+$sql_estudios = "SELECT em.Fecha, es.nombre AS especialidad, em.Imagenes, em.Informe, cm.id_consulta AS id_consulta, cm.motivo AS motivo
 FROM estudios_medicos em
 INNER JOIN especialidades es ON em.ID_Especialidad = es.ID_Especialidad
 INNER JOIN consultas_medicas cm ON em.ID_Consulta = cm.ID_Consulta
