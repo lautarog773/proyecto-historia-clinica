@@ -4,154 +4,145 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Historia Clínica Digital</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
-
+  <title>Perfil - Historia Clínica Digital</title>
+  
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-  <!-- Fonts -->
+  <!-- Fonts y CSS -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
-  <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
-
 </head>
 
 <body class="index-page">
 
   <header id="header" class="header sticky-top">
-<!-- 
-    <div class="topbar d-flex align-items-center">
-      <div class="container d-flex justify-content-center justify-content-md-between">
-        <div class="contact-info d-flex align-items-center">
-          <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">contact@example.com</a></i>
-          <i class="bi bi-phone d-flex align-items-center ms-4"><span>+1 5589 55488 55</span></i>
-        </div>
-        <div class="social-links d-none d-md-flex align-items-center">
-          <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-          <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-        </div>
-      </div>
-    </div> -->
-    <!-- End Top Bar -->
-
-    <div class="branding d-flex align-items-center">
-
-      <div class="container position-relative d-flex align-items-center justify-content-between">
-        <a href="index.php" class="logo d-flex align-items-center me-auto">
-          <!-- Uncomment the line below if you also wish to use an image logo -->
-          <!-- <img src="assets/img/logo.png" alt=""> -->
-          <h1 class="sitename">Historia Clínica Digital</h1>
-        </a>
-
-        <nav id="navmenu" class="navmenu">
-        <ul>
-          <li><a href="index.php" class="active">Inicio</a></li>
-          <li><a href="perfil.php">Perfil</a></li>
-          <li><a href="contact.php">Contacto</a></li>
-          <li><a href="logout.php">Cerrar Sesión</a></li>
+    <div class="container d-flex align-items-center justify-content-between">
+      <a href="index.php" class="logo d-flex align-items-center me-auto">
+        <h1 class="sitename">Historia Clínica Digital</h1>
+      </a>
+      <nav id="navmenu" class="navmenu">
+        <ul class="nav">
+          <li class="nav-item"><a href="index.php" class="nav-link">Inicio</a></li>
+          <li class="nav-item"><a href="perfil.php" class="nav-link active">Perfil</a></li>
+          <li class="nav-item"><a href="contact.php" class="nav-link">Contacto</a></li>
+          <li class="nav-item"><a href="logout.php" class="nav-link">Cerrar Sesión</a></li>
         </ul>
-          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-        </nav>
-
-
-      </div>
-
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
     </div>
-
   </header>
 
   <main class="main">
+    <section class="section">
+      <div class="container text-center py-4">
+        <h2>Perfil de Usuario</h2>
+      </div>
+      
+      <div class="container d-flex justify-content-center">
+        <div class="col-md-6 col-lg-6">
+          <?php
+            include 'conexion.php';
+            session_start();
+            $userId = $_SESSION['ID_Cuenta'];
+            
+            $query = "SELECT ID_Paciente, ID_Profesional, mail FROM cuentas WHERE ID_Cuenta = '$userId'";
+            $result = $conexion->query($query);
+            $user = $result->fetch_assoc();
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact section">
+            if ($user['ID_Paciente']) {
+                $patientId = $user['ID_Paciente'];
+                $query = "SELECT p.Nombre, p.Apellido, p.DNI, o.Nombre AS ObraSocial 
+                          FROM pacientes p 
+                          JOIN obras_sociales o ON p.ID_OS = o.ID_OS 
+                          WHERE p.ID_Paciente = '$patientId'";
+                $result = $conexion->query($query);
+                $profileData = $result->fetch_assoc();
 
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Perfil</h2>
-      </div><!-- End Section Title -->
+                $query = "SELECT COUNT(*) AS ConsultasAnuales 
+                          FROM consultas_medicas 
+                          WHERE ID_Paciente = '$patientId' 
+                          AND Fecha >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
+                $consultasResult = $conexion->query($query);
+                $consultasAnuales = $consultasResult->fetch_assoc()['ConsultasAnuales'];
+                
+                $query = "SELECT COUNT(*) AS EstudiosAnuales 
+                          FROM estudios_medicos em 
+                          JOIN consultas_medicas cm ON em.ID_Consulta = cm.ID_Consulta 
+                          WHERE cm.ID_Paciente = '$patientId' 
+                          AND cm.Fecha >= DATE_SUB(NOW(), INTERVAL 1 YEAR)";
+                $estudiosResult = $conexion->query($query);
+                $estudiosAnuales = $estudiosResult->fetch_assoc()['EstudiosAnuales'];
 
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="row gy-4">
-
-          <div class="col-lg-8">
-            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-              <div class="row gy-4">
-
-                <div class="col-md-6">
-                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
-                </div>
-
-                <div class="col-md-6 ">
-                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
-                </div>
-
-                <div class="col-md-12">
-                  <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
-                </div>
-
-                <div class="col-md-12">
-                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
-                </div>
-
-                <div class="col-md-12 text-center">
-                  <div class="loading">Loading</div>
-                  <div class="error-message"></div>
-                  <div class="sent-message">Your message has been sent. Thank you!</div>
-
-                  <button type="submit">Send Message</button>
-                </div>
-
-              </div>
-            </form>
-          </div><!-- End Contact Form -->
-
+                echo "<div class='card mb-3 shadow text-center'>";
+                echo "<div class='card-body'>";
+                echo "<h3 class='card-title'>Paciente</h3>";
+                echo "<p><strong>Nombre:</strong> " . $profileData['Nombre'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='Nombre' data-value='" . $profileData['Nombre'] . "'></i></p>";
+                echo "<p><strong>Apellido:</strong> " . $profileData['Apellido'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='Apellido' data-value='" . $profileData['Apellido'] . "'></i></p>";
+                echo "<p><strong>DNI:</strong> " . $profileData['DNI'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='DNI' data-value='" . $profileData['DNI'] . "'></i></p>";
+                echo "<p><strong>Correo:</strong> " . $user['mail'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='mail' data-value='" . $user['mail'] . "'></i></p>";
+                echo "<p><strong>Obra Social:</strong> " . $profileData['ObraSocial'] . "</p>";
+                echo "<p><strong>Cantidad de consultas último año:</strong> $consultasAnuales</p>";
+                echo "<p><strong>Cantidad de estudios último año:</strong> $estudiosAnuales</p>";
+                echo "</div></div>";
+                
+            }
+          ?>
         </div>
-
-    </section><!-- /Contact Section -->
-
+      </div>
+    </section>
   </main>
 
-  <footer class="footer light-background">
-    <div class="container copyright text-center">
-      <p>© 2024 <strong class="px-1 sitename">Historia Clinica Digital</strong> <span>Todos los derechos reservados </span></p>
+  <!-- modal para editar campo -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Editar Campo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editForm" method="POST" action="update_profile.php">
+          <div class="modal-body">
+            <input type="hidden" name="field" id="field">
+            <div class="mb-3">
+              <label for="fieldValue" class="form-label">Nuevo Valor</label>
+              <input type="text" class="form-control" id="fieldValue" name="fieldValue">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer bg-light text-center py-3">
+    <div class="container">
+      <p>© 2024 <strong>Historia Clínica Digital</strong> Todos los derechos reservados</p>
     </div>
   </footer>
-  
 
-  <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Preloader -->
-  <div id="preloader"></div>
-
-  <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
-  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-
-  <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
-
+  <script>
+    // vista modal campo actual
+    var editModal = document.getElementById('editModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+      var button = event.relatedTarget;
+      var field = button.getAttribute('data-field');
+      var value = button.getAttribute('data-value');
+      
+      document.getElementById('field').value = field;
+      document.getElementById('fieldValue').value = value;
+    });
+  </script>
 </body>
 
 </html>

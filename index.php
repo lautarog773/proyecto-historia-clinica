@@ -3,8 +3,8 @@ session_start();
 
 require 'conexion.php';
 
-// TEST ONLY
-//$_SESSION['ID_Cuenta'] = 4;
+ //TEST ONLY
+$_SESSION['ID_Cuenta'] = 4;
 
 
 // Verifica si el usuario está autenticado
