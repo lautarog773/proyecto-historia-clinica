@@ -231,33 +231,127 @@
   </div>
 
   <!-- Modal para agregar -->
-  <div class="modal fade" id="newAccountModal" tabindex="-1" aria-labelledby="newAccountModalLabel" aria-hidden="true">
+<!-- Modal para agregar -->
+<div class="modal fade" id="newAccountModal" tabindex="-1" aria-labelledby="newAccountModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form method="POST" action="crud_cuentas.php" onsubmit="return validateTipo()">
+      <form method="POST" action="crud_cuentas.php">
+
         <div class="modal-header">
           <h5 class="modal-title" id="newAccountModalLabel">Agregar Nueva Cuenta</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <!-- Campo Tipo -->
           <div class="mb-3">
-            <label for="id_tipo" class="form-label">ID Tipo</label>
-            <input type="text" class="form-control" name="id_tipo" id="id_tipo" required>
-            <small id="id_tipo_error" class="text-danger" style="display:none;">El ID Tipo debe ser 1, 2 o 3.</small>
+            <label for="tipo" class="form-label">Tipo</label>
+            <select class="form-select" name="id_tipo" id="tipo" onchange="toggleFields()" required>
+              <option value="">Seleccione un tipo</option>
+              <option value="1">Paciente</option>
+              <option value="2">Profesional</option>
+              <option value="3">Administrador</option>
+            </select>
           </div>
+          
+          <!-- Campos para Paciente y Profesional -->
+          <div id="pacienteProfesionalFields" style="display: none;">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" name="nombre" id="nombre">
+            </div>
+            <div class="mb-3">
+              <label for="apellido" class="form-label">Apellido</label>
+              <input type="text" class="form-control" name="apellido" id="apellido">
+            </div>
+            <div class="mb-3">
+              <label for="dni" class="form-label">DNI</label>
+              <input type="text" class="form-control" name="dni" id="dni">
+            </div>
+          </div>
+
+
+          <div id="passwordField" style="display: none;">
+            <div class="mb-3">
+              <label for="password_pp" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" name="password" id="password_pp">
+            </div>
+          </div>
+
+
+            <!-- Campos solo para Paciente -->
+            <div id="pacienteOSField" style="display: none;">
+            <div class="mb-3">
+              <label for="id_os" class="form-label">Obra Social</label>
+              <select class="form-select" name="id_os" id="id_os">
+                <option value="">Seleccione una obra social</option>
+                <?php
+                  // Consulta para obtener las obras sociales activas
+                  $result = $conexion->query("SELECT ID_OS, Nombre FROM obras_sociales");
+                  while ($row = $result->fetch_assoc()) {
+                    $id_os = htmlspecialchars($row['ID_OS'], ENT_QUOTES, 'UTF-8');
+                    $nombre_os = htmlspecialchars($row['Nombre'], ENT_QUOTES, 'UTF-8');
+                    echo "<option value='" . $id_os . "'>" . $nombre_os . "</option>";
+                  }
+                ?>
+
+              </select>
+            </div>
+          </div>
+          
+          <!-- Campos solo para Profesional -->
+
+          <div id="profesionalFields" style="display: none;">
+            <div class="mb-3">
+              <label for="matricula" class="form-label">Matrícula</label>
+              <input type="text" class="form-control" name="matricula" id="matricula">
+            </div>
+          </div>
+
+
+          <div id="especialidadField" style="display: none;">
+  <div class="mb-3">
+    <label for="id_especialidad" class="form-label">Especialidad</label>
+    <select class="form-select" name="id_especialidad" id="id_especialidad">
+      <option value="">Seleccione una especialidad</option>
+      <?php
+        // Consulta para obtener las especialidades
+        $result = $conexion->query("SELECT ID_Especialidad, Nombre FROM especialidades");
+        while ($row = $result->fetch_assoc()) {
+            $id_especialidad = htmlspecialchars($row['ID_Especialidad'], ENT_QUOTES, 'UTF-8');
+            $nombre_especialidad = htmlspecialchars($row['Nombre'], ENT_QUOTES, 'UTF-8');
+            echo "<option value='$id_especialidad'>$nombre_especialidad</option>";
+        }
+      ?>
+    </select>
+  </div>
+</div>
+
+          
+          <!-- Campos para Administrador -->
+          <div id="adminFields" style="display: none;">
+            <div class="mb-3">
+              <label for="password_admin" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" name="password" id="password_admin">
+            </div>
+          </div>
+          
+          <!-- Campo de mail -->
           <div class="mb-3">
             <label for="mail" class="form-label">Mail</label>
             <input type="email" class="form-control" name="mail" required>
           </div>
         </div>
+        
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
           <button type="submit" class="btn btn-primary" name="guardar_cuenta">Guardar</button>
         </div>
+        
       </form>
     </div>
   </div>
 </div>
+
 
   <footer class="footer light-background">
     <div class="container copyright text-center">
@@ -292,8 +386,59 @@
   }
 </script>
 
-  <!-- PHP Funcionalidad de Backend -->
+<script>
+function toggleFields() {
+    const tipoSelect = document.getElementById("tipo");
+    const pacienteProfesionalFields = document.getElementById("pacienteProfesionalFields");
+    const adminFields = document.getElementById("adminFields");
+    const pacienteOSField = document.getElementById("pacienteOSField");
+    const especialidadField = document.getElementById("especialidadField");
+    const profesionalFields = document.getElementById("profesionalFields");
+    const passwordField = document.getElementById("passwordField");
+
+    // Campos de contraseña
+    const passwordPP = document.getElementById("password_pp");
+    const passwordAdmin = document.getElementById("password_admin");
+
+    // Restablecer la visibilidad
+    pacienteProfesionalFields.style.display = "none";
+    adminFields.style.display = "none";
+    pacienteOSField.style.display = "none";
+    especialidadField.style.display = "none";
+    profesionalFields.style.display = "none";
+    passwordField.style.display = "none";
+
+    // Remover 'required' de ambos campos de contraseña
+    passwordPP.removeAttribute("required");
+    passwordAdmin.removeAttribute("required");
+
+    if (tipoSelect.value === "1") { // Paciente
+        pacienteProfesionalFields.style.display = "block";
+        pacienteOSField.style.display = "block";
+        passwordField.style.display = "block";
+        passwordPP.setAttribute("required", "required"); // Añadir 'required' al campo de Paciente/Profesional
+    } else if (tipoSelect.value === "2") { // Profesional
+        pacienteProfesionalFields.style.display = "block";
+        especialidadField.style.display = "block";
+        profesionalFields.style.display = "block";
+        passwordField.style.display = "block";
+        passwordPP.setAttribute("required", "required"); // Añadir 'required' al campo de Paciente/Profesional
+    } else if (tipoSelect.value === "3") { // Administrador
+        adminFields.style.display = "block";
+        passwordAdmin.setAttribute("required", "required"); // Añadir 'required' al campo de Administrador
+    }
+}
+</script>
+
+
+
+
+
+
+  <!--Backend -->
+
   <?php
+
   include "conexion.php";
 
   // Manejo de eliminación
@@ -330,20 +475,68 @@
   }
 
   // Inserción de nueva cuenta
-  if (isset($_POST['guardar_cuenta'])) {
-      $id_tipo = $_POST['id_tipo'];
-      $mail = $_POST['mail'];
-      $stmt = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail) VALUES (?, ?)");
-      $stmt->bind_param("is", $id_tipo, $mail);
 
-      if ($stmt->execute()) {
-          echo "<script>alert('Cuenta agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
-      } else {
-          echo "<script>alert('Error al agregar la cuenta');</script>";
-      }
-      $stmt->close();
-      $conexion->close();
-  }
+  
+  if (isset($_POST['guardar_cuenta'])) {
+    $id_tipo = intval($_POST['id_tipo']);
+    $mail = $_POST['mail'];
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+    $nombre = $_POST['nombre'];
+    $apellido = $_POST['apellido'];
+    $dni = $_POST['dni'];
+
+    // Comprobación de duplicidad de DNI en la tabla correspondiente
+    if ($id_tipo === 1) { // Si es un paciente, verifica en la tabla pacientes
+        $stmt_check_dni = $conexion->prepare("SELECT ID_Paciente FROM pacientes WHERE DNI = ?");
+        $stmt_check_dni->bind_param("s", $dni);
+    } else if ($id_tipo === 2) { // Si es un profesional, verifica en la tabla doctores
+        $stmt_check_dni = $conexion->prepare("SELECT ID_Profesional FROM doctores WHERE DNI = ?");
+        $stmt_check_dni->bind_param("s", $dni);
+    }
+
+    $stmt_check_dni->execute();
+    $stmt_check_dni->store_result();
+
+    if ($stmt_check_dni->num_rows > 0) {
+        echo "<script>alert('Error: El DNI ya está registrado en el sistema como $nombre en la categoría correspondiente.');</script>";
+    } else {
+        if ($id_tipo === 1) { // Paciente
+            $id_os = intval($_POST['id_os']); // Obtener ID_OS del formulario
+            $stmt = $conexion->prepare("INSERT INTO pacientes (Nombre, Apellido, DNI, ID_OS) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("sssi", $nombre, $apellido, $dni, $id_os);
+
+            if ($stmt->execute()) {
+                $id_paciente = $conexion->insert_id; // Guardar ID insertado
+                $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Paciente) VALUES (?, ?, ?, ?)");
+                $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_paciente);
+                $stmt_cuenta->execute();
+                echo "<script>alert('Cuenta de paciente agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+            } else {
+                echo "<script>alert('Error al insertar en pacientes: " . $stmt->error . "');</script>";
+            }
+        } else if ($id_tipo === 2) { // Profesional
+            $matricula = $_POST['matricula'];
+            $id_especialidad = intval($_POST['id_especialidad']); // Nuevo campo para especialidad
+            $stmt = $conexion->prepare("INSERT INTO doctores (Nombre, Apellido, DNI, Matricula, ID_Especialidad) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssi", $nombre, $apellido, $dni, $matricula, $id_especialidad);
+
+            if ($stmt->execute()) {
+                $id_profesional = $conexion->insert_id; // Guardar ID insertado
+                $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Profesional) VALUES (?, ?, ?, ?)");
+                $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_profesional);
+                $stmt_cuenta->execute();
+                echo "<script>alert('Cuenta de profesional agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+            } else {
+                echo "<script>alert('Error al insertar en doctores: " . $stmt->error . "');</script>";
+            }
+        }
+    }
+    $stmt_check_dni->close();
+}
+
+
+
   ?>
+
 </body>
 </html>
