@@ -49,6 +49,7 @@
   scroll-behavior: smooth;
 }
 
+
 /*--------------------------------------------------------------
 # General Styling & Shared Classes
 --------------------------------------------------------------*/
@@ -1742,4 +1743,14 @@ section,
 }
 #actualizar-perfil:hover {
   background: color-mix(in srgb, var(--accent-color), transparent 20%);
+}
+
+.header-consulta {
+  background-color: #007bff;
+  color: white;
+}
+
+.header-estudio {
+  background-color: #28a745;
+  color: white;
 }

@@ -4,7 +4,7 @@ session_start();
 require 'conexion.php';
 
 // TEST ONLY
-$_SESSION['ID_Cuenta'] = 30;
+//$_SESSION['ID_Cuenta'] = 2;
 
 
 // Verifica si el usuario está autenticado
@@ -47,7 +47,8 @@ if ($result->num_rows > 0) {
 // Consulta para obtener las consultas médicas del paciente
 $sql_consultas = "SELECT d.id_profesional as id_doctor, d.nombre as nombre_doctor, d.apellido as apellido_doctor,
                   cm.Motivo as motivo, cm.Tratamiento as tratamiento, cm.Diagnostico as diagnostico,
-                  cm.Comentarios as comentarios, cm.Fecha as fecha, e.Nombre as especialidad, e.ID_Especialidad as id_especialidad
+                  cm.Comentarios as comentarios, cm.Fecha as fecha, e.Nombre as especialidad, e.ID_Especialidad as id_especialidad,
+                  cm.id_consulta as ID_Consulta
                   FROM consultas_medicas cm
                   LEFT JOIN cuentas c ON c.ID_Paciente = cm.ID_Paciente
                   LEFT JOIN pacientes p ON c.ID_Paciente = p.ID_Paciente
@@ -275,10 +276,12 @@ unset($_SESSION['tab_activa']);
                 $fecha_valido = (empty($fecha_d) || $consulta['fecha'] >= $fecha_d) && (empty($fecha_h) || $consulta['fecha'] <= $fecha_h);
 
                 if ($motivo_valido && $doctor_valido && $especialidad_valido && $fecha_valido) :
+                  $consulta_id = $consulta['ID_Consulta'];
+                  $result_estudios = $conexion->query("SELECT em.*, e.nombre as especialidad FROM estudios_medicos em JOIN especialidades e ON em.id_especialidad = e.id_especialidad WHERE ID_Consulta = $consulta_id");
               ?>
                   <div class="col-md-4 mb-3">
                     <div class="card">
-                      <h5 class="card-header"><?php echo ($consulta['motivo']); ?></h5>
+                      <h5 class="card-header header-consulta"><?php echo ('#'. $consulta['ID_Consulta'] . ' - ' . $consulta['motivo']); ?></h5>
                       <div class="card-body">
                         <h5 class="card-title"><?php echo ($consulta['apellido_doctor'] . ' ' . $consulta['nombre_doctor']) . ' - ' . $consulta['especialidad']; ?></h5>
                         <p class="card-text"><?php echo ($consulta['fecha']); ?></p>
@@ -293,6 +296,27 @@ unset($_SESSION['tab_activa']);
                       </div>
                     </div>
                   </div>
+                  <?php
+                  while ($estudio = $result_estudios->fetch_assoc()) :
+                  ?>
+                    <div class="col-md-4 mb-3">
+                      <div class="card">
+                        <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#'. $consulta['ID_Consulta'] . ' - ' . $consulta['motivo']); ?></h5>
+                        <div class="card-body">
+                          <p class="card-text"><?php echo ($estudio['especialidad']) . ' - ' . ($estudio['Fecha']); ?></p>
+                          <p class="card-text"><?php echo ($estudio['Informe']); ?></p>
+                          <?php if (!empty($estudio['Imagenes'])) : ?>
+                            <a href="<?php echo htmlspecialchars($estudio['Imagenes']); ?>" target="_blank" class="btn btn-link">Ver Imagen</a>
+                          <?php else : ?>
+                            <a href="#" class="btn btn-link disabled" tabindex="-1" aria-disabled="true">No hay imagen asociada</a>
+                          <?php endif; ?>
+
+                        </div>
+                      </div>
+                    </div>
+                  <?php
+                  endwhile;
+                  ?>
               <?php
                 endif;
               endwhile; ?>
@@ -546,7 +570,7 @@ unset($_SESSION['tab_activa']);
           </table>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
@@ -564,7 +588,7 @@ unset($_SESSION['tab_activa']);
           <p id="mensajeResultado"><?php echo $consulta_result; ?></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>

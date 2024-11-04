@@ -1,3 +1,20 @@
+<?php
+session_start();
+
+require 'conexion.php';
+
+// TEST ONLY
+//$_SESSION['ID_Cuenta'] = 30;
+
+
+// Verifica si el usuario está autenticado
+if (!isset($_SESSION['ID_Cuenta'])) {
+  header("Location: login.php");
+  exit();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,15 +50,6 @@
 <body class="index-page">
 
   <header id="header" class="header sticky-top">
-
-    <div class="topbar d-flex align-items-center">
-      <div class="container d-flex justify-content-center justify-content-md-between">
-        <div class="contact-info d-flex align-items-center">
-          <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:info@historiaclinica.com">info@historiaclinica.com</a></i>
-          <i class="bi bi-phone d-flex align-items-center ms-4"><span>+0800 555 2368</span></i>
-        </div>
-      </div>
-    </div><!-- End Top Bar -->
 
     <div class="branding d-flex align-items-center">
 
