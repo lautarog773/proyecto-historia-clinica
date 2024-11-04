@@ -16,6 +16,7 @@
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
 </head>
 
 <body class="index-page">
@@ -75,11 +76,11 @@
               echo "<div class='card mb-3 shadow text-center'>";
               echo "<div class='card-body'>";
               echo "<h3 class='card-title'>Paciente</h3>";
-              echo "<p><strong>Nombre:</strong> " . $profileData['Nombre'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='Nombre' data-value='" . $profileData['Nombre'] . "'></i></p>";
-              echo "<p><strong>Apellido:</strong> " . $profileData['Apellido'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='Apellido' data-value='" . $profileData['Apellido'] . "'></i></p>";
+              echo "<p><strong>Nombre:</strong> " . $profileData['Nombre'] . " <i class='fa-solid fa-user-pen float-end text-primary cursor-pointer' data-bs-toggle='modal' data-bs-target='#editModal' data-field='Nombre' data-value='" . $profileData['Nombre'] . "'></i></p>";
+              echo "<p><strong>Apellido:</strong> " . $profileData['Apellido'] . " <i class='fa-solid fa-user-pen float-end text-primary cursor-pointer' data-bs-toggle='modal' data-bs-target='#editModal' data-field='Apellido' data-value='" . $profileData['Apellido'] . "'></i></p>";
               echo "<p><strong>DNI:</strong> " . $profileData['DNI'] . "</p>";  // no se muestra el ícono de edición para el DNI
-              echo "<p><strong>Correo:</strong> " . $user['mail'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='mail' data-value='" . $user['mail'] . "'></i></p>";
-              echo "<p><strong>Obra Social:</strong> " . $profileData['ObraSocial'] . " <i class='bi bi-pencil-square float-end text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-field='ObraSocial'></i></p>";
+              echo "<p><strong>Correo:</strong> " . $user['mail'] . " <i class='fa-solid fa-user-pen float-end text-primary cursor-pointer' data-bs-toggle='modal' data-bs-target='#editModal' data-field='mail' data-value='" . $user['mail'] . "'></i></p>";
+              echo "<p><strong>Obra Social:</strong> " . $profileData['ObraSocial'] . " <i class='fa-solid fa-user-pen float-end text-primary cursor-pointer' data-bs-toggle='modal' data-bs-target='#editModal' data-field='ObraSocial'></i></p>";
               echo "</div></div>";
           }
         ?>
