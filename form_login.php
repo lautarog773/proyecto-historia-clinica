@@ -82,7 +82,7 @@
         <h2>Bienvenido</h2>
       </div><!-- End Section Title -->
 
-      <form action="login.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+      <form action="login.php" method="post" data-aos="fade-up" data-aos-delay="200">
               <!--Especifica un formulario que envía datos mediante POST a login.php. 
               php-email-form es una clase que permite aplicar estilos específicos al formulario, 
               y el atributo data-aos agrega un efecto de animación. -->
@@ -90,13 +90,13 @@
       <!-- Email -->
       <div class="m-auto">
         <!-- <label for="email" class="form-label">Correo Electrónico</label> -->
-        <input type="email" class="form-control" id="email" placeholder="Ingrese su correo electronico" required >
+        <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su correo electronico" required >
       </div><br />
 
       <!-- Contraseña -->
       <div class="m-auto">
            <!--<label for="password" class="form-label">Contraseña</label> -->
-        <input type="password" class="form-control" id="pass" placeholder="Ingresa tu contraseña" required>
+        <input type="password" class="form-control" id="pass" name="pass" placeholder="Ingresa tu contraseña" required>
      </div><br />
 
     <button type="submit" class="btn btn-primary w-100" value="iniciar sesion">Iniciar Sesion</button>
