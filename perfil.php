@@ -1,3 +1,20 @@
+<?php
+session_start();
+
+require 'conexion.php';
+
+// TEST ONLY
+//$_SESSION['ID_Cuenta'] = 5;
+
+
+// Verifica si el usuario está autenticado
+if (!isset($_SESSION['ID_Cuenta'])) {
+  header("Location: form_login.php");
+  exit();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,7 +69,7 @@
       <div class="col-md-6 col-lg-6">
         <?php
           include 'conexion.php';
-          session_start();
+          //session_start();
           $userId = $_SESSION['ID_Cuenta'];
           
           $query = "SELECT ID_Paciente, ID_Profesional, mail FROM cuentas WHERE ID_Cuenta = '$userId'";
