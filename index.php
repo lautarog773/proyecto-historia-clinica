@@ -77,7 +77,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
 
-        <a class="cta-btn d-none d-sm-block" href="login.php">Cerrar Sesión</a>
+        <a class="cta-btn d-none d-sm-block" href="logout.php">Cerrar Sesión</a>
 
       </div>
 

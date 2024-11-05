@@ -90,23 +90,23 @@ $result = $conexion->query($query);
         <h2>Registro</h2>
       </div><!-- End Section Title -->
 
-  <form id="form_register" action="register.php" method="post" class="php-email-form m-auto" data-aos="fade-up" data-aos-delay="200">
+  <form id="form_register" action="register.php" method="post" data-aos="fade-up" data-aos-delay="200">
     <!-- Nombre -->
     <div class="m-auto">
 <!-- <label for="nombre" class="form-label">Nombre</label>-->
-      <input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre" required>
+      <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
     </div><br />
 
     <!-- Apellido -->
     <div class="m-auto">
       <!-- <label for="apellido" class="form-label">Apellido</label>-->
-      <input type="text" class="form-control" id="apellido" placeholder="Ingresa tu apellido" required>
+      <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingresa tu apellido" required>
     </div><br />
 
     <!-- DNI -->
     <div class="m-auto">
       <!-- <label for="dni" class="form-label">DNI</label>-->
-      <input type="number" class="form-control" id="dni" placeholder="Ingresa tu DNI" required>
+      <input type="number" class="form-control" id="dni" name="dni" placeholder="Ingresa tu DNI" required>
     </div><br />
 
     <div class="m-auto">
@@ -121,13 +121,13 @@ $result = $conexion->query($query);
     <!-- Email -->
     <div class="m-auto">
       <!-- <label for="email" class="form-label">Correo Electrónico</label>-->
-      <input type="email" class="form-control" id="email" placeholder="Ingresa tu correo electronico" required>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Ingresa tu correo electronico" required>
     </div><br />
 
     <!-- Contraseña -->
     <div class="m-auto">
       <!-- <label for="password" class="form-label">Contraseña</label>-->
-      <input type="password" class="form-control" id="pass" placeholder="Ingresa tu contraseña" required>
+      <input type="password" class="form-control" id="pass" name="pass" placeholder="Ingresa tu contraseña" required>
     </div><br/>
 
     <div class="col-md-12 text-center">
@@ -135,7 +135,8 @@ $result = $conexion->query($query);
                 </div><br/>
     <!-- Botón Registrarse -->
     <button type="submit" class="btn btn-primary w-100">Registrarse</button>
-    <!--<div id="passwordError" class="alert alert-danger">La nueva contraseña no cumple con los requisitos de seguridad.</div>-->
+    
+    <div id="passwordError" class="alert alert-danger" style="display:none;">La nueva contraseña no cumple con los requisitos de seguridad.</div>
   </form>
   <br/>
   <a href="form_login.php">Ya tenes cuenta? Iniciar Sesion</a>  
@@ -173,41 +174,26 @@ $result = $conexion->query($query);
   <!-- Main JS File --> <!-- Archivo JavaScript personalizado que controla el comportamiento del sitio-->
   <script src="assets/js/main.js"></script>
 
-  <!--<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('status')) {
-        const status = urlParams.get('status');
-        if (status === 'success') {
-          document.getElementById('successMessage').style.display = 'block';
-        } else if (status === 'error') {
-          document.getElementById('errorMessage').style.display = 'block';
-        }
-
-        setTimeout(() => {
-          document.getElementById('errorMessage').style.display = 'none';
-        }, 5000);
-      }
-      // validar la contraseña antes de enviar el formulario
       document.getElementById('form_register').addEventListener('submit', function (e) {
-        const password = document.getElementById('pass').value;
-        const passwordError = document.getElementById('passwordError');
+       const password = document.getElementById('pass').value;
+       const passwordError = document.getElementById('passwordError');
 
-        // validar la contraseña
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+       // validar la contraseña
+       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-        if (!passwordRegex.test(password)) {
-          e.preventDefault(); 
-          passwordError.style.display = 'block';
+       if (!passwordRegex.test(password)) {
+           e.preventDefault(); // Detiene el envío del formulario si la contraseña no cumple
+           passwordError.style.display = 'block';
 
-          setTimeout(() => {
-            passwordError.style.display = 'none';
-          }, 5000);
-        }
-      });
+           setTimeout(() => {
+               passwordError.style.display = 'none';
+           }, 5000);
+       }
+     });
     });
   </script>
-            -->
 </body>
 
 </html>
