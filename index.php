@@ -4,7 +4,7 @@ session_start();
 require 'conexion.php';
 
 // TEST ONLY
-//$_SESSION['ID_Cuenta'] = 4;
+$_SESSION['ID_Cuenta'] = 5;
 
 
 // Verifica si el usuario está autenticado
