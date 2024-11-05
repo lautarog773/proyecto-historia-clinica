@@ -4,12 +4,12 @@ session_start();
 require 'conexion.php';
 
 // TEST ONLY
-$SESSION['ID_Cuenta'] = 30;
+//$SESSION['ID_Cuenta'] = 30;
 
 
 // Verifica si el usuario está autenticado
 if (!isset($_SESSION['ID_Cuenta'])) {
-  header("Location: login.php");
+  header("Location: form_login.php");
   exit();
 }
 

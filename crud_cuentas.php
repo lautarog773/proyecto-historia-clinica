@@ -1,3 +1,20 @@
+<?php
+session_start();
+
+require 'conexion.php';
+
+// TEST ONLY
+//$_SESSION['ID_Cuenta'] = 5;
+
+
+// Verifica si el usuario está autenticado
+if (!isset($_SESSION['ID_Cuenta'])) {
+  header("Location: form_login.php");
+  exit();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
