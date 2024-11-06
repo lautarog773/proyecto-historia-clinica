@@ -15,24 +15,29 @@ $obrasocial = filter_input(INPUT_POST, 'obrasocial', FILTER_VALIDATE_INT);
 $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
 $pass = sha1($_POST['pass']);
 
-// Debug: mostrar los valores capturados
-//var_dump($nombre, $apellido, $dni, $obrasocial, $email, $pass);
-
-	/*if ($_POST['tyc'] === "") {
-		$tyc="no";
-	} else {
-		$tyc="si";
-	}*/
-
   if (!$nombre || !$apellido || !$dni || !$obrasocial || !$email || !$pass) {
     die("Datos inválidos. Por favor, verifique la información e intente nuevamente.");
   }
-/*
-  $consulta = mysqli_query($conexion, "INSERT INTO pacientes (Nombre, Apellido, DNI, ID_OS) 
-  VALUES('$nombre','$apellido','$dni', '$obrasocial'");
-  $consulta2 = mysqli_query($conexion, "INSERT INTO cuentas (ID_Paciente, ID_Tipo, Password, Mail) 
-  VALUES('$id_paciente', 1, '$pass', '$email'");
-*/
+
+  $verificar_mail = mysqli_query($conexion,"SELECT * FROM cuentas WHERE Mail='$email'");
+  if(mysqli_num_rows($verificar_mail) > 0){
+    echo "
+    <script>
+    alert('El correo electrónico ingresado ya se encuentra registrado');
+    window.location.href = 'form_register.php';
+    </script>";
+    exit();
+  }
+
+  $verificar_dni = mysqli_query($conexion,"SELECT * FROM pacientes WHERE DNI='$dni'");
+  if(mysqli_num_rows($verificar_dni) > 0){
+    echo "
+    <script>
+    alert('El DNI ingresado ya se encuentra registrado');
+    window.location.href = 'form_register.php';
+    </script>";
+    exit();
+  }
   try {
     $conexion->begin_transaction();
 
@@ -65,8 +70,10 @@ if ($stmt2->error) {
     // Confirmar la transacción
     $conexion->commit();
 
-    echo "<script>alert('Usuario registrado exitosamente');</script>";
-    header("Location: form_login.php");
+    echo "<script>
+    alert('Usuario registrado exitosamente');
+    window.location.href = 'form_login.php';
+    </script>";
     exit();
 } catch (Exception $e) {
     $conexion->rollback(); // Revertir la transacción en caso de error
@@ -79,9 +86,7 @@ if (isset($stmt1)) {
 if (isset($stmt2)) {
   $stmt2->close();
 }
-/*
-$consulta->close();
-$consulta2->close();*/
+
 $conexion->close();
 
 ?>
