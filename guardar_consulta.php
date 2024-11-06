@@ -3,7 +3,7 @@ session_start();
 require 'conexion.php';
 
 // TEST ONLY
-$_SESSION['ID_Cuenta'] = 30;
+//$_SESSION['ID_Cuenta'] = 30;
 
 // Verificar si el usuario es un doctor
 if (!isset($_SESSION['ID_Cuenta']) || !esDoctor($_SESSION['ID_Cuenta'], $conexion)) {

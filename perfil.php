@@ -50,6 +50,15 @@ if (!isset($_SESSION['ID_Cuenta'])) {
           <li><a href="index.php">Inicio</a></li>
           <li><a href="perfil.php">Mi Perfil</a></li>
           <li><a href="consulta.php">Consultas</a></li>
+          <?php if ($tipo_usuario == 3) : ?>
+              <li class="dropdown"><a href="crud.php"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="crud_especialidades.php">Especialidades</a></li>
+                  <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
+                  <li><a href="crud_cuentas.php">Cuentas</a></li>
+                </ul>
+              </li>
+            <?php endif; ?>
           <li><a href="contact.php">Contacto</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

@@ -160,13 +160,15 @@ unset($_SESSION['tab_activa']);
             <li><a href="index.php">Inicio<br></a></li>
             <li><a href="perfil.php">Mi Perfil</a></li>
             <li><a href="consulta.php" class="active">Consultas</a></li>
-            <li class="dropdown"><a href="crud.php"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-              <ul>
-                <li><a href="crud_especialidades.php">Especialidades</a></li>
-                <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
-                <li><a href="crud_cuentas.php">Cuentas</a></li>
-              </ul>
-            </li>
+            <?php if ($tipo_usuario == 3) : ?>
+              <li class="dropdown"><a href="crud.php"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="crud_especialidades.php">Especialidades</a></li>
+                  <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
+                  <li><a href="crud_cuentas.php">Cuentas</a></li>
+                </ul>
+              </li>
+            <?php endif; ?>
             <li><a href="contact.php">Contacto</a></li>
           </ul>
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -281,7 +283,7 @@ unset($_SESSION['tab_activa']);
               ?>
                   <div class="col-md-4 mb-3">
                     <div class="card">
-                      <h5 class="card-header header-consulta"><?php echo ('#'. $consulta['ID_Consulta'] . ' - ' . $consulta['motivo']); ?></h5>
+                      <h5 class="card-header header-consulta"><?php echo ('#' . $consulta['ID_Consulta'] . ' - ' . $consulta['motivo']); ?></h5>
                       <div class="card-body">
                         <h5 class="card-title"><?php echo ($consulta['apellido_doctor'] . ' ' . $consulta['nombre_doctor']) . ' - ' . $consulta['especialidad']; ?></h5>
                         <p class="card-text"><?php echo ($consulta['fecha']); ?></p>
@@ -301,7 +303,7 @@ unset($_SESSION['tab_activa']);
                   ?>
                     <div class="col-md-4 mb-3">
                       <div class="card">
-                        <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#'. $consulta['ID_Consulta'] . ' - ' . $consulta['motivo']); ?></h5>
+                        <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#' . $consulta['ID_Consulta'] . ' - ' . $consulta['motivo']); ?></h5>
                         <div class="card-body">
                           <p class="card-text"><?php echo ($estudio['especialidad']) . ' - ' . ($estudio['Fecha']); ?></p>
                           <p class="card-text"><?php echo ($estudio['Informe']); ?></p>
@@ -450,7 +452,7 @@ unset($_SESSION['tab_activa']);
                         <?php foreach ($historial_consultas as $consulta): ?>
                           <div class="col-md-4 mb-3">
                             <div class="card">
-                              <h5 class="card-header header-consulta"><?php echo '#' . ($consulta['id_consulta']) . ' - ' .($consulta['motivo']); ?></h5>
+                              <h5 class="card-header header-consulta"><?php echo '#' . ($consulta['id_consulta']) . ' - ' . ($consulta['motivo']); ?></h5>
                               <div class="card-body">
                                 <h5 class="card-title"><?php echo ($consulta['diagnostico']); ?></h5>
                                 <p class="card-text">
@@ -482,8 +484,8 @@ unset($_SESSION['tab_activa']);
                         <?php foreach ($historial_estudios as $estudio): ?>
                           <div class="col-md-4 mb-3">
                             <div class="card">
-                              <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#'. $estudio['id_consulta'] . ' - ' . $estudio['motivo']); ?></h5>
-                              
+                              <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#' . $estudio['id_consulta'] . ' - ' . $estudio['motivo']); ?></h5>
+
                               <div class="card-body">
                                 <p class="card-text">
                                   <strong>Especialidad:</strong> <?php echo ($estudio['especialidad']); ?><br>

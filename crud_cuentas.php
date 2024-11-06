@@ -1,22 +1,4 @@
 <?php
-<<<<<<< HEAD
-session_start();
-
-require 'conexion.php';
-
-// TEST ONLY
-//$_SESSION['ID_Cuenta'] = 5;
-
-
-// Verifica si el usuario está autenticado
-if (!isset($_SESSION['ID_Cuenta'])) {
-  header("Location: form_login.php");
-  exit();
-}
-
-?>
-
-=======
 include 'conexion.php';
 
 // Detecta si es una solicitud AJAX para cargar datos de un registro específico
@@ -56,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 
 
->>>>>>> 2fc650c4abddd566d2ff2095daf49b052c29cce7
 <!DOCTYPE html>
 <html lang="en">
 

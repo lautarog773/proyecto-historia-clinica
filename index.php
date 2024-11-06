@@ -4,7 +4,7 @@ session_start();
 require 'conexion.php';
 
 // TEST ONLY
-$_SESSION['ID_Cuenta'] = 5;
+//$_SESSION['ID_Cuenta'] = 5;
 
 
 // Verifica si el usuario está autenticado
@@ -65,13 +65,15 @@ if (!isset($_SESSION['ID_Cuenta'])) {
             <li><a href="index.php" class="active">Inicio<br></a></li>
             <li><a href="perfil.php">Mi Perfil</a></li>
             <li><a href="consulta.php">Consultas</a></li>
-            <li class="dropdown"><a href="crud.php"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-              <ul>
-                <li><a href="crud_especialidades.php">Especialidades</a></li>
-                <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
-                <li><a href="crud_cuentas.php">Cuentas</a></li>
-              </ul>
-            </li>
+            <?php if ($tipo_usuario == 3) : ?>
+              <li class="dropdown"><a href="crud.php"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="crud_especialidades.php">Especialidades</a></li>
+                  <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
+                  <li><a href="crud_cuentas.php">Cuentas</a></li>
+                </ul>
+              </li>
+            <?php endif; ?>
             <li><a href="contact.php">Contacto</a></li>
           </ul>
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
