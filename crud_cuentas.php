@@ -1,3 +1,43 @@
+<?php
+include 'conexion.php';
+
+// Detecta si es una solicitud AJAX para cargar datos de un registro específico
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'fetchData') {
+    $id = intval($_POST['id']);
+    
+    // Consulta base para la cuenta
+    $stmt = $conexion->prepare("SELECT * FROM cuentas WHERE ID_Cuenta = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_assoc();
+
+    // Consultar datos adicionales dependiendo del tipo de cuenta
+    if ($data['ID_Tipo'] == 1) { // Paciente
+        $stmt = $conexion->prepare("SELECT Nombre, Apellido, DNI, ID_OS FROM pacientes WHERE ID_Paciente = ?");
+        $stmt->bind_param("i", $data['ID_Paciente']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $pacienteData = $result->fetch_assoc();
+        $data = array_merge($data, $pacienteData);
+    } elseif ($data['ID_Tipo'] == 2) { // Profesional
+        $stmt = $conexion->prepare("SELECT Nombre, Apellido, DNI, Matricula, ID_Especialidad FROM doctores WHERE ID_Profesional = ?");
+        $stmt->bind_param("i", $data['ID_Profesional']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $doctorData = $result->fetch_assoc();
+        $data = array_merge($data, $doctorData);
+    }
+
+    // Enviar los datos como JSON y detener la ejecución
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit();
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -202,33 +242,113 @@
 
   <!-- Modales -->
   <!-- Modal para editar -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="POST" action="crud_cuentas.php">
-          <div class="modal-header">
-            <h5 class="modal-title" id="editModalLabel">Editar Cuenta</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="crud_cuentas.php">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Editar Cuenta</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Campo oculto para ID_Cuenta -->
+          <input type="hidden" name="id_cuenta" id="editIdCuenta">
+          
+          <!-- Campos generales -->
+          <div class="mb-3">
+            <label for="editTipo" class="form-label">Tipo</label>
+            <select class="form-select" name="id_tipo" id="editTipo" onchange="toggleEditFields()" required>
+              <option value="1">Paciente</option>
+              <option value="2">Profesional</option>
+              <option value="3">Administrador</option>
+            </select>
           </div>
-          <div class="modal-body">
-            <input type="hidden" name="id_cuenta" id="editIdCuenta">
+          <div class="mb-3">
+            <label for="editMail" class="form-label">Mail</label>
+            <input type="email" class="form-control" name="mail" id="editMail" required>
+          </div>
+
+          <!-- Campos para Paciente -->
+          <div id="editPacienteFields" style="display: none;">
             <div class="mb-3">
-              <label for="id_tipo" class="form-label">ID Tipo</label>
-              <input type="text" class="form-control" name="id_tipo" id="editIdTipo">
+                <label for="editNombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" name="nombre_paciente" id="editNombre">
             </div>
             <div class="mb-3">
-              <label for="mail" class="form-label">Mail</label>
-              <input type="text" class="form-control" name="mail" id="editMail">
+                <label for="editApellido" class="form-label">Apellido</label>
+                <input type="text" class="form-control" name="apellido_paciente" id="editApellido">
+            </div>
+            <div class="mb-3">
+                <label for="editDni" class="form-label">DNI</label>
+                <input type="text" class="form-control" name="dni_paciente" id="editDni">
+            </div>
+            <div class="mb-3">
+                <label for="editObraSocial" class="form-label">Obra Social</label>
+
+              <select class="form-select" name="id_os" id="editObraSocial">
+                <?php
+                  // Consulta para obtener las obras sociales
+                  $result = $conexion->query("SELECT ID_OS, Nombre FROM obras_sociales");
+                  while ($row = $result->fetch_assoc()) {
+                    $id_os = htmlspecialchars($row['ID_OS'], ENT_QUOTES, 'UTF-8');
+                    $nombre_os = htmlspecialchars($row['Nombre'], ENT_QUOTES, 'UTF-8');
+                    echo "<option value='$id_os'>$nombre_os</option>";
+                  }
+                ?>
+              </select>
+
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary" name="actualizar">Guardar cambios</button>
+
+          <!-- Campos para Profesional -->
+          <div id="editProfesionalFields" style="display: none;">
+              <div class="mb-3">
+                  <label for="editNombreProfesional" class="form-label">Nombre</label>
+                  <input type="text" class="form-control" name="nombre_profesional" id="editNombreProfesional">
+              </div>
+              <div class="mb-3">
+                  <label for="editApellidoProfesional" class="form-label">Apellido</label>
+                  <input type="text" class="form-control" name="apellido_profesional" id="editApellidoProfesional">
+              </div>
+              <div class="mb-3">
+                  <label for="editDniProfesional" class="form-label">DNI</label>
+                  <input type="text" class="form-control" name="dni_profesional" id="editDniProfesional">
+              </div>
+              <div class="mb-3">
+                  <label for="editMatricula" class="form-label">Matrícula</label>
+                  <input type="text" class="form-control" name="matricula" id="editMatricula">
+              </div>
+              <div class="mb-3">
+                <label for="editEspecialidad" class="form-label">Especialidad</label>
+                <select class="form-select" name="id_especialidad" id="editEspecialidad">
+                    <?php
+                    // Consulta para obtener las especialidades
+                    $result = $conexion->query("SELECT ID_Especialidad, Nombre FROM especialidades");
+                    while ($row = $result->fetch_assoc()) {
+                        $id_especialidad = htmlspecialchars($row['ID_Especialidad'], ENT_QUOTES, 'UTF-8');
+                        $nombre_especialidad = htmlspecialchars($row['Nombre'], ENT_QUOTES, 'UTF-8');
+                        echo "<option value='$id_especialidad'>$nombre_especialidad</option>";
+                    }
+                    ?>
+                </select>
+              </div>
+
           </div>
-        </form>
-      </div>
+
+          <!-- Campos para Administrador (si tienes campos adicionales, agrégalos aquí) -->
+          <!-- ... -->
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" name="actualizar">Guardar cambios</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+
+
 
   <!-- Modal para agregar -->
 <!-- Modal para agregar -->
@@ -360,14 +480,77 @@
   </footer>
 
   <!-- Scripts -->
+
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    function editRecord(id, tipo, mail) {
-      document.getElementById('editIdCuenta').value = id;
-      document.getElementById('editIdTipo').value = tipo;
-      document.getElementById('editMail').value = mail;
-      new bootstrap.Modal(document.getElementById('editModal')).show();
+function editRecord(id) {
+    // Fetch para cargar datos en el modal
+    fetch('crud_cuentas.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=fetchData&id=' + id
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Llenar campos del modal con datos de la cuenta
+        document.getElementById('editIdCuenta').value = data.ID_Cuenta;
+        document.getElementById('editTipo').value = data.ID_Tipo;
+        document.getElementById('editMail').value = data.Mail;
+
+        // Mostrar los campos según el tipo
+        toggleEditFields();
+
+        // Llenar campos adicionales según el tipo
+        if (data.ID_Tipo == 1) { // Paciente
+            document.getElementById('editNombre').value = data.Nombre;
+            document.getElementById('editApellido').value = data.Apellido;
+            document.getElementById('editDni').value = data.DNI;
+            document.getElementById('editObraSocial').value = data.ID_OS;
+        } else if (data.ID_Tipo == 2) { // Profesional
+            document.getElementById('editNombreProfesional').value = data.Nombre;
+            document.getElementById('editApellidoProfesional').value = data.Apellido;
+            document.getElementById('editDniProfesional').value = data.DNI;
+            document.getElementById('editMatricula').value = data.Matricula;
+            document.getElementById('editEspecialidad').value = data.ID_Especialidad;
+        }
+
+        // Mostrar el modal de edición
+        new bootstrap.Modal(document.getElementById('editModal')).show();
+    });
+}
+
+
+
+function toggleEditFields() {
+    const tipo = document.getElementById('editTipo').value;
+    const pacienteFields = document.querySelectorAll('#editPacienteFields input, #editPacienteFields select');
+    const profesionalFields = document.querySelectorAll('#editProfesionalFields input, #editProfesionalFields select');
+
+    if (tipo == 1) { // Paciente
+        document.getElementById('editPacienteFields').style.display = 'block';
+        document.getElementById('editProfesionalFields').style.display = 'none';
+
+        pacienteFields.forEach(el => el.disabled = false);
+        profesionalFields.forEach(el => el.disabled = true);
+    } else if (tipo == 2) { // Profesional
+        document.getElementById('editPacienteFields').style.display = 'none';
+        document.getElementById('editProfesionalFields').style.display = 'block';
+
+        pacienteFields.forEach(el => el.disabled = true);
+        profesionalFields.forEach(el => el.disabled = false);
+    } else { // Administrador
+        document.getElementById('editPacienteFields').style.display = 'none';
+        document.getElementById('editProfesionalFields').style.display = 'none';
+
+        pacienteFields.forEach(el => el.disabled = true);
+        profesionalFields.forEach(el => el.disabled = true);
     }
+}
+
+
   </script>
 
 <script>
@@ -441,38 +624,148 @@ function toggleFields() {
 
   include "conexion.php";
 
-  // Manejo de eliminación
-  if (isset($_GET['delete'])) {
-      $id_cuenta = intval($_GET['delete']);
-      $stmt = $conexion->prepare("DELETE FROM cuentas WHERE ID_Cuenta = ?");
-      $stmt->bind_param("i", $id_cuenta);
+// Manejo de eliminación
+if (isset($_GET['delete'])) {
+  $id_cuenta = intval($_GET['delete']);
+
+  // Obtener información de la cuenta
+  $stmt = $conexion->prepare("SELECT ID_Tipo, ID_Paciente, ID_Profesional FROM cuentas WHERE ID_Cuenta = ?");
+  $stmt->bind_param("i", $id_cuenta);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $cuenta = $result->fetch_assoc();
+  $stmt->close();
+
+  if ($cuenta) {
+      $id_tipo = $cuenta['ID_Tipo'];
+
+      // Iniciar transacción
+      $conexion->begin_transaction();
 
       try {
+          // **Primero, eliminar la cuenta**
+          $stmt = $conexion->prepare("DELETE FROM cuentas WHERE ID_Cuenta = ?");
+          $stmt->bind_param("i", $id_cuenta);
           $stmt->execute();
+          $stmt->close();
+
+          // **Luego, eliminar registros relacionados**
+          if ($id_tipo == 1) { // Paciente
+              $id_paciente = $cuenta['ID_Paciente'];
+
+              // Verificar si $id_paciente no es nulo
+              if (!empty($id_paciente)) {
+                  // Eliminar paciente
+                  $stmt = $conexion->prepare("DELETE FROM pacientes WHERE ID_Paciente = ?");
+                  $stmt->bind_param("i", $id_paciente);
+                  $stmt->execute();
+                  $stmt->close();
+              }
+          } elseif ($id_tipo == 2) { // Profesional
+              $id_profesional = $cuenta['ID_Profesional'];
+
+              // Verificar si $id_profesional no es nulo
+              if (!empty($id_profesional)) {
+                  // Eliminar profesional
+                  $stmt = $conexion->prepare("DELETE FROM doctores WHERE ID_Profesional = ?");
+                  $stmt->bind_param("i", $id_profesional);
+                  $stmt->execute();
+                  $stmt->close();
+              }
+          }
+
+          // Confirmar transacción
+          $conexion->commit();
+
           echo "<script>alert('Cuenta eliminada exitosamente'); window.location.href='crud_cuentas.php';</script>";
       } catch (mysqli_sql_exception $e) {
-          echo "<script>alert('No se puede eliminar la cuenta porque tiene datos relacionados.');</script>";
+          // Revertir transacción
+          $conexion->rollback();
+
+          // Verificar el código de error
+          if ($e->getCode() == 1451) {
+              // Violación de restricción de clave foránea
+              echo "<script>alert('No se puede eliminar la cuenta porque tiene datos relacionados.'); window.location.href='crud_cuentas.php';</script>";
+          } else {
+              // Otros errores
+              echo "<script>alert('Error al eliminar la cuenta: " . $e->getMessage() . "'); window.location.href='crud_cuentas.php';</script>";
+          }
       }
-      $stmt->close();
+  } else {
+      echo "<script>alert('Cuenta no encontrada'); window.location.href='crud_cuentas.php';</script>";
   }
+}
 
-  // Actualización de datos
-  if (isset($_POST['actualizar'])) {
-      $id_cuenta = intval($_POST['id_cuenta']);
-      $id_tipo = $_POST['id_tipo'];
-      $mail = $_POST['mail'];
 
-      $stmt = $conexion->prepare("UPDATE cuentas SET ID_Tipo = ?, Mail = ? WHERE ID_Cuenta = ?");
-      $stmt->bind_param("isi", $id_tipo, $mail, $id_cuenta);
 
-      if ($stmt->execute()) {
-          echo "<script>alert('Cuenta actualizada exitosamente');</script>";
-          echo "<script>window.location.href = 'crud_cuentas.php';</script>";
-      } else {
-          echo "<script>alert('Error al actualizar la cuenta');</script>";
+
+// Actualización de datos
+// Actualización de datos
+if (isset($_POST['actualizar'])) {
+  $id_cuenta = intval($_POST['id_cuenta']);
+  $id_tipo = $_POST['id_tipo'];
+  $mail = $_POST['mail'];
+
+  // Actualizar la tabla 'cuentas'
+  $stmt = $conexion->prepare("UPDATE cuentas SET ID_Tipo = ?, Mail = ? WHERE ID_Cuenta = ?");
+  $stmt->bind_param("isi", $id_tipo, $mail, $id_cuenta);
+
+  if ($stmt->execute()) {
+      // Actualizar tablas adicionales según el tipo
+      if ($id_tipo == 1) { // Paciente
+          $nombre = $_POST['nombre_paciente'];
+          $apellido = $_POST['apellido_paciente'];
+          $dni = $_POST['dni_paciente'];
+          $id_os = intval($_POST['id_os']);
+
+          // Obtener ID_Paciente asociado
+          $stmt_paciente = $conexion->prepare("SELECT ID_Paciente FROM cuentas WHERE ID_Cuenta = ?");
+          $stmt_paciente->bind_param("i", $id_cuenta);
+          $stmt_paciente->execute();
+          $result_paciente = $stmt_paciente->get_result();
+          if ($row = $result_paciente->fetch_assoc()) {
+              $id_paciente = $row['ID_Paciente'];
+              $stmt_update_paciente = $conexion->prepare("UPDATE pacientes SET Nombre = ?, Apellido = ?, DNI = ?, ID_OS = ? WHERE ID_Paciente = ?");
+              $stmt_update_paciente->bind_param("sssii", $nombre, $apellido, $dni, $id_os, $id_paciente);
+              $stmt_update_paciente->execute();
+              $stmt_update_paciente->close();
+          }
+          $stmt_paciente->close();
+      } elseif ($id_tipo == 2) { // Profesional
+          $nombre = $_POST['nombre_profesional'];
+          $apellido = $_POST['apellido_profesional'];
+          $dni = $_POST['dni_profesional'];
+          $matricula = $_POST['matricula'];
+          $id_especialidad = intval($_POST['id_especialidad']);
+
+          // Verificar que $id_especialidad tiene un valor válido
+          if (empty($id_especialidad)) {
+              echo "<script>alert('Error: Debe seleccionar una especialidad.');</script>";
+              exit;
+          }
+
+          // Obtener ID_Profesional asociado
+          $stmt_profesional = $conexion->prepare("SELECT ID_Profesional FROM cuentas WHERE ID_Cuenta = ?");
+          $stmt_profesional->bind_param("i", $id_cuenta);
+          $stmt_profesional->execute();
+          $result_profesional = $stmt_profesional->get_result();
+          if ($row = $result_profesional->fetch_assoc()) {
+              $id_profesional = $row['ID_Profesional'];
+              $stmt_update_profesional = $conexion->prepare("UPDATE doctores SET Nombre = ?, Apellido = ?, DNI = ?, Matricula = ?, ID_Especialidad = ? WHERE ID_Profesional = ?");
+              $stmt_update_profesional->bind_param("sssiii", $nombre, $apellido, $dni, $matricula, $id_especialidad, $id_profesional);
+              $stmt_update_profesional->execute();
+              $stmt_update_profesional->close();
+          }
+          $stmt_profesional->close();
       }
-      $stmt->close();
+      echo "<script>alert('Cuenta actualizada exitosamente');</script>";
+      echo "<script>window.location.href = 'crud_cuentas.php';</script>";
+  } else {
+      echo "<script>alert('Error al actualizar la cuenta');</script>";
   }
+  $stmt->close();
+}
+
 
   // Inserción de nueva cuenta
 
@@ -537,6 +830,7 @@ function toggleFields() {
 
 
   ?>
+
 
 </body>
 </html>
