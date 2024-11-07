@@ -39,7 +39,6 @@ if($resultado > 0){/*Comienza una estructura condicional que verifica si hay al 
 			$_SESSION['Apellido']=$respuesta2['Apellido'];/* Almacena el apellido del usuario en la sesión*/
 		}  
 		echo "<script>
-		alert('Usuario registrado exitosamente');
 		window.location.href = 'index.php';
 		</script>";
 		exit();

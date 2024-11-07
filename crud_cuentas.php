@@ -769,67 +769,75 @@ if (isset($_POST['actualizar'])) {
 
   // Inserción de nueva cuenta
 
-  
   if (isset($_POST['guardar_cuenta'])) {
     $id_tipo = intval($_POST['id_tipo']);
     $mail = $_POST['mail'];
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+    $password = sha1($_POST['password']); // Encriptación con SHA1
     $nombre = $_POST['nombre'];
     $apellido = $_POST['apellido'];
     $dni = $_POST['dni'];
 
-    // Comprobación de duplicidad de DNI en la tabla correspondiente
-    if ($id_tipo === 1) { // Si es un paciente, verifica en la tabla pacientes
+    // Verificación de duplicidad del DNI para pacientes y profesionales
+    if ($id_tipo === 1) { 
         $stmt_check_dni = $conexion->prepare("SELECT ID_Paciente FROM pacientes WHERE DNI = ?");
         $stmt_check_dni->bind_param("s", $dni);
-    } else if ($id_tipo === 2) { // Si es un profesional, verifica en la tabla doctores
+    } elseif ($id_tipo === 2) { 
         $stmt_check_dni = $conexion->prepare("SELECT ID_Profesional FROM doctores WHERE DNI = ?");
         $stmt_check_dni->bind_param("s", $dni);
     }
 
-    $stmt_check_dni->execute();
-    $stmt_check_dni->store_result();
+    if (isset($stmt_check_dni)) { // Si hay chequeo de duplicidad (para pacientes/profesionales)
+        $stmt_check_dni->execute();
+        $stmt_check_dni->store_result();
+        if ($stmt_check_dni->num_rows > 0) {
+            echo "<script>alert('Error: El DNI ya está registrado.');</script>";
+            $stmt_check_dni->close();
+            exit;
+        }
+        $stmt_check_dni->close();
+    }
 
-    if ($stmt_check_dni->num_rows > 0) {
-        echo "<script>alert('Error: El DNI ya está registrado en el sistema como $nombre en la categoría correspondiente.');</script>";
-    } else {
-        if ($id_tipo === 1) { // Paciente
-            $id_os = intval($_POST['id_os']); // Obtener ID_OS del formulario
-            $stmt = $conexion->prepare("INSERT INTO pacientes (Nombre, Apellido, DNI, ID_OS) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("sssi", $nombre, $apellido, $dni, $id_os);
+    // Proceso de inserción según el tipo
+    if ($id_tipo === 1) { // Paciente
+        // Inserción en tabla pacientes y luego en cuentas
+        $id_os = intval($_POST['id_os']);
+        $stmt = $conexion->prepare("INSERT INTO pacientes (Nombre, Apellido, DNI, ID_OS) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sssi", $nombre, $apellido, $dni, $id_os);
+        if ($stmt->execute()) {
+            $id_paciente = $conexion->insert_id;
+            $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Paciente) VALUES (?, ?, ?, ?)");
+            $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_paciente);
+            $stmt_cuenta->execute();
+            echo "<script>alert('Cuenta de paciente agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+        }
 
-            if ($stmt->execute()) {
-                $id_paciente = $conexion->insert_id; // Guardar ID insertado
-                $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Paciente) VALUES (?, ?, ?, ?)");
-                $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_paciente);
-                $stmt_cuenta->execute();
-                echo "<script>alert('Cuenta de paciente agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
-            } else {
-                echo "<script>alert('Error al insertar en pacientes: " . $stmt->error . "');</script>";
-            }
-        } else if ($id_tipo === 2) { // Profesional
-            $matricula = $_POST['matricula'];
-            $id_especialidad = intval($_POST['id_especialidad']); // Nuevo campo para especialidad
-            $stmt = $conexion->prepare("INSERT INTO doctores (Nombre, Apellido, DNI, Matricula, ID_Especialidad) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssi", $nombre, $apellido, $dni, $matricula, $id_especialidad);
+    } elseif ($id_tipo === 2) { // Profesional
+        // Inserción en tabla doctores y luego en cuentas
+        $matricula = $_POST['matricula'];
+        $id_especialidad = intval($_POST['id_especialidad']);
+        $stmt = $conexion->prepare("INSERT INTO doctores (Nombre, Apellido, DNI, Matricula, ID_Especialidad) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssi", $nombre, $apellido, $dni, $matricula, $id_especialidad);
+        if ($stmt->execute()) {
+            $id_profesional = $conexion->insert_id;
+            $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Profesional) VALUES (?, ?, ?, ?)");
+            $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_profesional);
+            $stmt_cuenta->execute();
+            echo "<script>alert('Cuenta de profesional agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+        }
 
-            if ($stmt->execute()) {
-                $id_profesional = $conexion->insert_id; // Guardar ID insertado
-                $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Profesional) VALUES (?, ?, ?, ?)");
-                $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_profesional);
-                $stmt_cuenta->execute();
-                echo "<script>alert('Cuenta de profesional agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
-            } else {
-                echo "<script>alert('Error al insertar en doctores: " . $stmt->error . "');</script>";
-            }
+    } elseif ($id_tipo === 3) { // Administrador
+        // Inserción directamente en cuentas sin tabla extra
+        $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password) VALUES (?, ?, ?)");
+        $stmt_cuenta->bind_param("iss", $id_tipo, $mail, $password);
+        if ($stmt_cuenta->execute()) {
+            echo "<script>alert('Cuenta de administrador agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+        } else {
+            echo "<script>alert('Error al insertar la cuenta de administrador');</script>";
         }
     }
-    $stmt_check_dni->close();
 }
 
-
-
-  ?>
+?>
 
 
 </body>

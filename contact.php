@@ -1,3 +1,51 @@
+<?php
+session_start();
+
+require 'conexion.php';
+
+// TEST ONLY
+//$SESSION['ID_Cuenta'] = 30;
+
+
+// Verifica si el usuario está autenticado
+if (!isset($_SESSION['ID_Cuenta'])) {
+  header("Location: form_login.php");
+  exit();
+}
+
+
+// Obtener información del usuario
+$id_cuenta = $_SESSION['ID_Cuenta'];
+
+// Consulta para obtener el nombre del usuario
+$sql = "SELECT c.ID_tipo, p.Nombre AS nombre_paciente, d.Nombre AS nombre_medico
+        FROM cuentas c
+        LEFT JOIN pacientes p ON c.ID_Paciente = p.ID_Paciente
+        LEFT JOIN doctores d ON c.ID_Profesional = d.ID_Profesional
+        WHERE ID_Cuenta = $id_cuenta";
+
+// Ejecuta la consulta
+$result = $conexion->query($sql);
+
+
+if ($result->num_rows > 0) {
+  $usuario = $result->fetch_assoc();
+  $tipo_usuario = $usuario['ID_tipo'];
+
+
+  if ($tipo_usuario == 1) {
+    $nombre_usuario = $usuario['nombre_paciente'];
+  } elseif ($tipo_usuario == 2) {
+    $nombre_usuario = $usuario['nombre_medico'];
+  }
+} else {
+  // Si no se encuentra el usuario, redirigir a login
+  header("Location: login.php");
+  exit();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
