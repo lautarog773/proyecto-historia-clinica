@@ -184,7 +184,9 @@ unset($_SESSION['tab_activa']);
 
   <main class="main">
     <section id="principal" class="hero section light-background">
-      <div class="container position-relative">
+
+      <!--<img src="assets/img/consulta.jpg" alt="" class="fixed-image">-->
+      <div class="container position-relative card-consulta">
 
         <!-- Mensaje de bienvenida -->
         <div class="welcome position-relative text-center mb-4" data-aos="fade-down" data-aos-delay="100">
@@ -446,7 +448,6 @@ unset($_SESSION['tab_activa']);
                     <h3>Historial del Paciente</h3>
 
                     <!-- Sección de Consultas -->
-                    <h4>Consultas</h4>
                     <div class="row col-md-12">
                       <?php if (is_array($historial_consultas) && count($historial_consultas) > 0): ?>
                         <?php foreach ($historial_consultas as $consulta): ?>
@@ -471,41 +472,41 @@ unset($_SESSION['tab_activa']);
                               </div>
                             </div>
                           </div>
+
+                          <!-- Sección de Estudios Médicos -->
+
+                          <?php if (is_array($historial_estudios) && count($historial_estudios) > 0): ?>
+                            <?php foreach ($historial_estudios as $estudio): ?>
+                              <div class="col-md-4 mb-3">
+                                <div class="card">
+                                  <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#' . $estudio['id_consulta'] . ' - ' . $estudio['motivo']); ?></h5>
+
+                                  <div class="card-body">
+                                    <p class="card-text">
+                                      <strong>Especialidad:</strong> <?php echo ($estudio['especialidad']); ?><br>
+                                      <strong>Fecha:</strong> <?php echo ($estudio['Fecha']); ?><br>
+                                      <strong>Informe:</strong> <?php echo ($estudio['Informe']); ?><br>
+                                      <strong>Imagen:</strong>
+                                      <?php if (!empty($estudio['Imagenes'])): ?>
+                                        <a href="<?php echo ($estudio['Imagenes']); ?>" target="_blank">Ver Imagen</a>
+                                      <?php else: ?>
+                                        Sin imagen
+                                      <?php endif; ?>
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            <?php endforeach; ?>
+                          <?php endif; ?>
+
+
                         <?php endforeach; ?>
                       <?php else: ?>
                         <p>No hay consultas registradas para este paciente.</p>
                       <?php endif; ?>
                     </div>
 
-                    <!-- Sección de Estudios Médicos -->
-                    <h4>Estudios Médicos</h4>
-                    <div class="row col-md-12">
-                      <?php if (is_array($historial_estudios) && count($historial_estudios) > 0): ?>
-                        <?php foreach ($historial_estudios as $estudio): ?>
-                          <div class="col-md-4 mb-3">
-                            <div class="card">
-                              <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#' . $estudio['id_consulta'] . ' - ' . $estudio['motivo']); ?></h5>
 
-                              <div class="card-body">
-                                <p class="card-text">
-                                  <strong>Especialidad:</strong> <?php echo ($estudio['especialidad']); ?><br>
-                                  <strong>Fecha:</strong> <?php echo ($estudio['Fecha']); ?><br>
-                                  <strong>Informe:</strong> <?php echo ($estudio['Informe']); ?><br>
-                                  <strong>Imagen:</strong>
-                                  <?php if (!empty($estudio['Imagenes'])): ?>
-                                    <a href="<?php echo ($estudio['Imagenes']); ?>" target="_blank">Ver Imagen</a>
-                                  <?php else: ?>
-                                    Sin imagen
-                                  <?php endif; ?>
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        <?php endforeach; ?>
-                      <?php else: ?>
-                        <p>No hay estudios registrados para este paciente.</p>
-                      <?php endif; ?>
-                    </div>
                   </div>
                 <?php endif; ?>
               </div>

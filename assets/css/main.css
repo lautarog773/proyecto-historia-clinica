@@ -1754,3 +1754,22 @@ section,
   background-color: #28a745;
   color: white;
 }
+
+.card-consulta{
+  background-color: rgba(241, 247, 252, 0.9);
+  padding: 50px;
+  border-radius: 10px;
+  min-height: 500px;
+}
+
+.hero {
+  background-image: url("../img/consulta.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+
+
