@@ -82,26 +82,62 @@
         <h2>Bienvenido</h2>
       </div><!-- End Section Title -->
 
-      <form action="login.php" method="post" data-aos="fade-up" data-aos-delay="200">
-              <!--Especifica un formulario que envía datos mediante POST a login.php. 
-              php-email-form es una clase que permite aplicar estilos específicos al formulario, 
-              y el atributo data-aos agrega un efecto de animación. -->
-              
-      <!-- Email -->
-      <div class="m-auto">
-        <!-- <label for="email" class="form-label">Correo Electrónico</label> -->
-        <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su correo electronico" required >
-      </div><br />
-
-      <!-- Contraseña -->
-      <div class="m-auto">
-           <!--<label for="password" class="form-label">Contraseña</label> -->
+      <!-- Spinner oculto inicialmente -->
+    <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+      
+    <form id="login-form" onsubmit="loginUser(event)">
+    <!-- Tus campos de formulario existentes -->
+    <div class="m-auto">
+        <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su correo electrónico" required>
+    </div><br />
+    <div class="m-auto">
         <input type="password" class="form-control" id="pass" name="pass" placeholder="Ingresa tu contraseña" required>
-     </div><br />
+    </div><br />
+    <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+</form>
 
-    <button type="submit" class="btn btn-primary w-100" value="iniciar sesion">Iniciar Sesion</button>
+<script>
+    async function loginUser(event) {
+        event.preventDefault();
 
-    </form>
+        // Mostrar el spinner
+        document.getElementById("loading-spinner").style.display = "block";
+
+        const email = document.getElementById("email").value;
+        const pass = document.getElementById("pass").value;
+
+        try {
+            const response = await fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`
+            });
+
+            const result = await response.text();
+
+            // Ocultar el spinner después de la respuesta
+            document.getElementById("loading-spinner").style.display = "none";
+
+            if (response.ok) {
+                if (result.includes("incorrectas")) {
+                    showAlert("Las credenciales son incorrectas: Usuario o contraseña no válidos");
+                } else {
+                    window.location.href = 'index.php';
+                }
+            } else {
+                showAlert("Error en el servidor. Por favor, intenta de nuevo más tarde.");
+            }
+        } catch (error) {
+            document.getElementById("loading-spinner").style.display = "none";
+            showAlert("Error de conexión. Verifica tu conexión a internet e intenta nuevamente.");
+        }
+    }
+</script>
+
     <br/>
             <a href="form_register.php">Registrarse</a> <br/>
             <a href="recover-password.php">Olvido su contraseña?</a>
@@ -137,6 +173,33 @@
 
   <!-- Main JS File --> <!-- Archivo JavaScript personalizado que controla el comportamiento del sitio-->
   <script src="assets/js/main.js"></script>
+
+<!-- Modal para mostrar mensajes de error -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertModalLabel">Advertencia</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="alertMessage">
+        <!-- Mensaje de error se mostrará aquí -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function showAlert(message) {
+        document.getElementById("alertMessage").textContent = message;
+        var alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+        alertModal.show();
+    }
+</script>
+
 
 </body>
 

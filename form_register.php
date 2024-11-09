@@ -128,6 +128,9 @@ $result = $conexion->query($query);
     <div class="m-auto">
       <!-- <label for="password" class="form-label">Contraseña</label>-->
       <input type="password" class="form-control" id="pass" name="pass" placeholder="Ingresa tu contraseña" required>
+      <small class="form-text text-muted">
+       La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula, un número y un carácter especial (!@#$%^&*).
+      </small>
     </div><br/>
 
     <div class="col-md-12 text-center">

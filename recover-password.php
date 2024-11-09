@@ -56,6 +56,9 @@
 
               <div class="col-md-12">
                 <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Nueva Contraseña" required>
+                <small class="form-text text-muted">
+                La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula, un número y un carácter especial (!@#$%^&*).
+                </small>
               </div>
 
               <div class="col-md-12 text-center">
