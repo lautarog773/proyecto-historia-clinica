@@ -9,7 +9,7 @@ require 'conexion.php';
 
 // Verifica si el usuario está autenticado
 if (!isset($_SESSION['ID_Cuenta'])) {
-  header("Location: form_login.php");
+  header("Location: index_sin_login.php");
   exit();
 }
 
@@ -85,7 +85,6 @@ if ($result->num_rows > 0) {
 
       <div class="container position-relative d-flex align-items-center justify-content-between">
         <a href="index.php" class="logo d-flex align-items-center me-auto">
-          <!-- Uncomment the line below if you also wish to use an image logo -->
           <!-- <img src="assets/img/logo.png" alt=""> -->
           <h1 class="sitename">Historia Clínica Digital</h1>
         </a>

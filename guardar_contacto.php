@@ -1,45 +1,22 @@
 <?php
-include 'conexion.php';
-session_start(); // Asegurarse de iniciar sesión para usar variables de sesión
+header('Content-Type: application/json');
 
-// Recibir los datos del formulario
-$nombre = $_POST['name'];
-$email = $_POST['email'];
-$asunto = $_POST['subject'];
-$mensaje = $_POST['message'];
+try {
+    include 'conexion.php';
 
-// Validar que todos los campos están completos
-if (!empty($nombre) && !empty($email) && !empty($asunto) && !empty($mensaje)) {
-    
-    // Preparar la consulta para insertar los datos en la tabla 'contactos'
-    $query = "INSERT INTO contactos (Nombre, Mail, Asunto, Mensaje) VALUES (?, ?, ?, ?)";
-    $stmt = $conexion->prepare($query);
-    
-    if ($stmt) {
-        $stmt->bind_param("ssss", $nombre, $email, $asunto, $mensaje);
-        
-        // Ejecutar la consulta
-        if ($stmt->execute()) {
-            // Mensaje de éxito en la sesión
-            $_SESSION['message'] = "Su mensaje ha sido enviado correctamente.";
-        } else {
-            // Error al ejecutar la consulta
-            $_SESSION['error'] = "Error al enviar el mensaje. Intente nuevamente.";
-        }
-        $stmt->close();
-    } else {
-        // Error al preparar la consulta
-        $_SESSION['error'] = "Error en el servidor. Intente nuevamente.";
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $subject = $_POST['subject'];
+    $message = $_POST['message'];
+
+    if (!empty($name) && !empty($email) && !empty($subject) && !empty($message)) {
+        $query = $conexion->prepare("INSERT INTO contactos (Nombre, Mail, Asunto, Mensaje) VALUES (?, ?, ?, ?)");
+        $query->bind_param("ssss", $name, $email, $subject, $message);
+        $query->execute();
     }
-} else {
-    // Redirigir con mensaje de error si faltan datos
-    $_SESSION['error'] = "Todos los campos son obligatorios.";
+
+    echo json_encode(['status' => 'success']);
+} catch (Exception $e) {
+    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
-
-// Cerrar la conexión a la base de datos
-$conexion->close();
-
-// Redirigir de vuelta a contact.php
-header("Location: contact.php");
-exit();
 ?>
