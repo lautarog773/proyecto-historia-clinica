@@ -71,8 +71,8 @@ if (!isset($_SESSION['ID_Cuenta'])) {
             <li><a href="index.php">Inicio</a></li>
             <li><a href="perfil.php">Mi Perfil</a></li>
             <li><a href="consulta.php">Consultas</a></li>
-            <li class="dropdown"><a href="crud.php" class="active"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-              <ul>                
+            <li class="dropdown"><a href="crud.php" class="active"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+              <ul>
                 <li><a href="crud_especialidades.php">Especialidades</a></li>
                 <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
                 <li><a href="crud_cuentas.php">Cuentas</a></li>
@@ -91,7 +91,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
   <main class="main">
     <section id="contact" class="contact section container mt-4">
       <div class="container section-title">
-        <h2>CRUD Especialidades</h2>
+        <h2>ABM Especialidades</h2>
       </div>
 
       <!-- Sección de acciones (Botón + Formulario de búsqueda) -->
@@ -164,7 +164,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
                   <a href="#" onclick="editRecord(<?= $datos->ID_Especialidad ?>, '<?= $datos->Nombre ?>')" title="Editar" class="text-primary me-3">
                     <i class="fa-solid fa-user-pen"></i>
                   </a>
-                  <a href="?delete=<?= $datos->ID_Especialidad ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar esta especialidad?');" title="Eliminar" class="text-danger">
+                  <a href="#" onclick="confirmDelete(<?= $datos->ID_Especialidad ?>);" title="Eliminar" class="text-danger">
                     <i class="fa-solid fa-trash"></i>
                   </a>
                 </td>
@@ -190,7 +190,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
           <div class="modal-body">
             <input type="hidden" name="id_especialidad" id="editIdEsp">
             <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
+              <label for="editNombre" class="form-label">Nombre</label>
               <input type="text" class="form-control" name="nombre" id="editNombre">
             </div>
           </div>
@@ -227,6 +227,43 @@ if (!isset($_SESSION['ID_Cuenta'])) {
     </div>
   </div>
 
+  <!-- Modal para mostrar mensajes de error y confirmación -->
+  <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="alertModalLabel">Mensaje</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="alertMessage">
+          <!-- El mensaje se mostrará aquí -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación de eliminación -->
+  <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          ¿Estás seguro de que deseas eliminar esta especialidad?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteButton">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer light-background">
     <div class="container copyright text-center">
       <p>© 2024 <strong class="px-1 sitename">Historia Clinica Digital</strong> <span>Todos los derechos reservados</span></p>
@@ -241,6 +278,25 @@ if (!isset($_SESSION['ID_Cuenta'])) {
       document.getElementById('editNombre').value = nombre;
       new bootstrap.Modal(document.getElementById('editModal')).show();
     }
+
+    function showAlert(message) {
+      document.getElementById("alertMessage").textContent = message;
+      var alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+      alertModal.show();
+    }
+
+    let deleteId = null; // Variable para almacenar el ID a eliminar
+
+    function confirmDelete(id) {
+      deleteId = id; // Guardamos el ID de la especialidad a eliminar
+      var confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+      confirmDeleteModal.show();
+    }
+
+    document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+      // Redirigir a la URL de eliminación con el ID correspondiente
+      window.location.href = '?delete=' + deleteId;
+    });
   </script>
 
   <!-- PHP Funcionalidad de Backend -->
@@ -255,9 +311,10 @@ if (!isset($_SESSION['ID_Cuenta'])) {
 
       try {
           $stmt->execute();
-          echo "<script>alert('Especialidad eliminada exitosamente'); window.location.href='crud_especialidades.php';</script>";
+          echo "<script>showAlert('Especialidad eliminada exitosamente');</script>";
+          echo "<script>setTimeout(function(){ window.location.href='crud_especialidades.php'; }, 2000);</script>";
       } catch (mysqli_sql_exception $e) {
-          echo "<script>alert('No se puede eliminar la especialidad porque tiene datos relacionados.');</script>";
+          echo "<script>showAlert('No se puede eliminar la especialidad porque tiene datos relacionados.');</script>";
       }
       $stmt->close();
   }
@@ -271,10 +328,10 @@ if (!isset($_SESSION['ID_Cuenta'])) {
       $stmt->bind_param("si", $nombre, $id_especialidad);
 
       if ($stmt->execute()) {
-          echo "<script>alert('Especialidad actualizada exitosamente');</script>";
-          echo "<script>window.location.href = 'crud_especialidades.php';</script>";
+          echo "<script>showAlert('Especialidad actualizada exitosamente');</script>";
+          echo "<script>setTimeout(function(){ window.location.href='crud_especialidades.php'; }, 2000);</script>";
       } else {
-          echo "<script>alert('Error al actualizar la especialidad');</script>";
+          echo "<script>showAlert('Error al actualizar la especialidad');</script>";
       }
       $stmt->close();
   }
@@ -286,9 +343,10 @@ if (!isset($_SESSION['ID_Cuenta'])) {
       $stmt->bind_param("s", $nombre_especialidad);
 
       if ($stmt->execute()) {
-          echo "<script>alert('Especialidad agregada exitosamente'); window.location.href='crud_especialidades.php';</script>";
+          echo "<script>showAlert('Especialidad agregada exitosamente');</script>";
+          echo "<script>setTimeout(function(){ window.location.href='crud_especialidades.php'; }, 2000);</script>";
       } else {
-          echo "<script>alert('Error al agregar la especialidad');</script>";
+          echo "<script>showAlert('Error al agregar la especialidad');</script>";
       }
       $stmt->close();
       $conexion->close();

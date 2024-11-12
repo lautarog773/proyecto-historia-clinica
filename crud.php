@@ -74,7 +74,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
             <li><a href="index.php">Inicio<br></a></li>
             <li><a href="perfil.php">Mi Perfil</a></li>
             <li><a href="consulta.php">Consultas</a></li>
-            <li class="dropdown"><a href="crud.php" class="active"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <li class="dropdown"><a href="crud.php" class="active"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>                
                 <li><a href="crud_especialidades.php">Especialidades</a></li>
                 <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
@@ -103,7 +103,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
 
       <div class="container">
       <div class="section-title" data-aos="fade-up">
-        <h2>CRUD</h2>
+        <h2>Administrador</h2>
       </div>
 
         <div class="row gy-4">
@@ -138,9 +138,9 @@ if (!isset($_SESSION['ID_Cuenta'])) {
                 <i class="fas fa-hospital-user"></i>
               </div>
               <a href="crud_cuentas.php" class="stretched-link">
-                <h3>Cuenta Administrador</h3>
+                <h3>Cuentas</h3>
               </a>
-              <p>Agregar, modificar o eliminar Administradores.</p>
+              <p>Agregar, modificar o eliminar Cuentas.</p>
             </div>
           </div><!-- End Service Item -->
 

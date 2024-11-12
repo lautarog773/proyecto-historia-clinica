@@ -15,6 +15,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
 
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -71,7 +72,7 @@ if (!isset($_SESSION['ID_Cuenta'])) {
             <li><a href="index.php">Inicio</a></li>
             <li><a href="perfil.php">Mi Perfil</a></li>
             <li><a href="consulta.php">Consultas</a></li>
-            <li class="dropdown"><a href="crud.php" class="active"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <li class="dropdown"><a href="crud.php" class="active"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>                
                 <li><a href="crud_especialidades.php">Especialidades</a></li>
                 <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
@@ -83,221 +84,275 @@ if (!isset($_SESSION['ID_Cuenta'])) {
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
 
-        <a class="cta-btn d-none d-sm-block" href="logout.php">Cerrar Sesión</a>
+        <a class="cta-btn d-none d-sm-block" href="login.php">Cerrar Sesión</a>
       </div>
     </div>
   </header>
 
-<main class="main">
+  <main class="main">
 
-  <section id="contact" class="contact section container mt-4">
+<section id="contact" class="contact section container mt-4">
 
-      <div class="container section-title">
-        <h2>CRUD Obras Sociales</h2>
-      </div>
-  
-    <!-- Sección de acciones (Botón + Formulario de búsqueda) -->
-    <div class="row mb-4 align-items-center">
-      <!-- Botón "Nueva Obra Social" -->
-      <div class="col-md-3 col-12 mb-2 mb-md-0">
-        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#newOsModal">
-          Nueva Obra Social
-        </button>
-      </div>
+  <div class="container section-title">
+    <h2>ABM Obras Sociales</h2>
+  </div>
 
-      <!-- Formulario de búsqueda -->
-      <form method="GET" action="crud_obras_sociales.php" class="col-md-9 col-12 row gx-2">
-        <div class="col-md-5 col-12 mb-2 mb-md-0">
-          <input type="text" class="form-control" name="id_cuenta" placeholder="🔍 ID OS" value="<?php echo isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : ''; ?>">
-        </div>
-        <div class="col-md-5 col-12 mb-2 mb-md-0">
-          <input type="text" class="form-control" name="nombre" placeholder="🔍 Nombre" value="<?php echo isset($_GET['nombre']) ? $_GET['nombre'] : ''; ?>">
-        </div>
-        <div class="col-md-2 col-12">
-          <button type="submit" class="btn btn-primary w-100" name="buscar" value="ok">Buscar</button>
-        </div>
-      </form>
+  <!-- Sección de acciones (Botón + Formulario de búsqueda) -->
+  <div class="row mb-4 align-items-center">
+    <!-- Botón "Nueva Obra Social" -->
+    <div class="col-md-3 col-12 mb-2 mb-md-0">
+      <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#newOsModal">
+        Nueva Obra Social
+      </button>
     </div>
 
-    <!-- Tabla de resultados -->
-    <div class="table-responsive">
-      <table class="table table-striped table-hover">
-        <thead class="bg-info text-white">
+    <!-- Formulario de búsqueda -->
+    <form method="GET" action="crud_obras_sociales.php" class="col-md-9 col-12 row gx-2">
+      <div class="col-md-5 col-12 mb-2 mb-md-0">
+        <input type="text" class="form-control" name="id_cuenta" placeholder="🔍 ID OS" value="<?php echo isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : ''; ?>">
+      </div>
+      <div class="col-md-5 col-12 mb-2 mb-md-0">
+        <input type="text" class="form-control" name="nombre" placeholder="🔍 Nombre" value="<?php echo isset($_GET['nombre']) ? $_GET['nombre'] : ''; ?>">
+      </div>
+      <div class="col-md-2 col-12">
+        <button type="submit" class="btn btn-primary w-100" name="buscar" value="ok">Buscar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de resultados -->
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="bg-info text-white">
+        <tr>
+          <th scope="col">ID OS</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        include "conexion.php";
+        $id_cuenta = isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : '';
+        $nombre = isset($_GET['nombre']) ? $_GET['nombre'] : '';
+        $query = "SELECT * FROM obras_sociales WHERE 1=1";
+        $params = [];
+        $types = "";
+
+        if (!empty($id_cuenta)) {
+            $query .= " AND ID_OS LIKE ?";
+            $params[] = "%" . $id_cuenta . "%";
+            $types .= "s";
+        }
+        if (!empty($nombre)) {
+            $query .= " AND Nombre LIKE ?";
+            $params[] = "%" . $nombre . "%";
+            $types .= "s";
+        }
+
+        if (!empty($params)) {
+            $stmt = $conexion->prepare($query);
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $result = $conexion->query($query);
+        }
+
+        while ($datos = $result->fetch_object()) { ?>
           <tr>
-            <th scope="col">ID OS</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Acciones</th>
+            <td><?= $datos->ID_OS ?></td>
+            <td><?= $datos->Nombre ?></td>
+            <td>
+              <a href="#" onclick="editRecord(<?= $datos->ID_OS ?>, '<?= $datos->Nombre ?>')" title="Editar" class="text-primary me-3">
+                <i class="fa-solid fa-user-pen"></i>
+              </a>
+              <a href="#" onclick="confirmDelete(<?= $datos->ID_OS ?>);" title="Eliminar" class="text-danger">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <?php
-          include "conexion.php";
-          $id_cuenta = isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : '';
-          $nombre = isset($_GET['nombre']) ? $_GET['nombre'] : '';
-          $query = "SELECT * FROM obras_sociales WHERE 1=1";
-          $params = [];
-          $types = "";
-
-          if (!empty($id_cuenta)) {
-              $query .= " AND ID_OS LIKE ?";
-              $params[] = "%" . $id_cuenta . "%";
-              $types .= "s";
-          }
-          if (!empty($nombre)) {
-              $query .= " AND Nombre LIKE ?";
-              $params[] = "%" . $nombre . "%";
-              $types .= "s";
-          }
-
-          if (!empty($params)) {
-              $stmt = $conexion->prepare($query);
-              $stmt->bind_param($types, ...$params);
-              $stmt->execute();
-              $result = $stmt->get_result();
-          } else {
-              $result = $conexion->query($query);
-          }
-
-          while ($datos = $result->fetch_object()) { ?>
-            <tr>
-              <td><?= $datos->ID_OS ?></td>
-              <td><?= $datos->Nombre ?></td>
-              <td>
-                <a href="#" onclick="editRecord(<?= $datos->ID_OS ?>, '<?= $datos->Nombre ?>')" title="Editar" class="text-primary me-3">
-                  <i class="fa-solid fa-user-pen"></i>
-                </a>
-                <a href="?delete=<?= $datos->ID_OS ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar esta obra social?');" title="Eliminar" class="text-danger">
-                  <i class="fa-solid fa-trash"></i>
-                </a>
-              </td>
-            </tr>
-          <?php }
-          ?>
-        </tbody>
-      </table>
-    </div>
-  </section>
+        <?php }
+        ?>
+      </tbody>
+    </table>
+  </div>
+</section>
 </main>
 
 <!-- Modales -->
 <!-- Modal para editar -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form method="POST" action="crud_obras_sociales.php">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editModalLabel">Editar Obra Social</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal-dialog">
+  <div class="modal-content">
+    <form method="POST" action="crud_obras_sociales.php">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Editar Obra Social</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="id_os" id="editIdOs">
+        <div class="mb-3">
+          <label for="editNombre" class="form-label">Nombre</label>
+          <input type="text" class="form-control" name="nombre" id="editNombre">
         </div>
-        <div class="modal-body">
-          <input type="hidden" name="id_os" id="editIdOs">
-          <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" name="nombre" id="editNombre">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary" name="actualizar">Guardar cambios</button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" name="actualizar">Guardar cambios</button>
+      </div>
+    </form>
   </div>
+</div>
 </div>
 
 <!-- Modal para agregar -->
 <div class="modal fade" id="newOsModal" tabindex="-1" aria-labelledby="newOsModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal-dialog">
+  <div class="modal-content">
+    <form method="POST" action="crud_obras_sociales.php">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newOsModalLabel">Agregar Nueva Obra Social</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="nombre_os" class="form-label">Nombre de la Obra Social</label>
+          <input type="text" class="form-control" name="nombre_os" id="nombre_os" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" name="guardar_os">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+
+<!-- Modal para mostrar mensajes de error y confirmación -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="alertModalLabel">Mensaje</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body" id="alertMessage">
+      <!-- El mensaje se mostrará aquí -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form method="POST" action="crud_obras_sociales.php">
-        <div class="modal-header">
-          <h5 class="modal-title" id="newOsModalLabel">Agregar Nueva Obra Social</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="nombre_os" class="form-label">Nombre de la Obra Social</label>
-            <input type="text" class="form-control" name="nombre_os" id="nombre_os" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary" name="guardar_os">Guardar</button>
-        </div>
-      </form>
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas eliminar esta obra social?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Eliminar</button>
+      </div>
     </div>
   </div>
 </div>
 
+
 <footer class="footer light-background">
-    <div class="container copyright text-center">
-      <p>© 2024 <strong class="px-1 sitename">Historia Clinica Digital</strong> <span>Todos los derechos reservados</span></p>
-    </div>
-  </footer>
+<div class="container copyright text-center">
+  <p>© 2024 <strong class="px-1 sitename">Historia Clinica Digital</strong> <span>Todos los derechos reservados</span></p>
+</div>
+</footer>
 
 <!-- Scripts -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-  function editRecord(id, nombre) {
-    document.getElementById('editIdOs').value = id;
-    document.getElementById('editNombre').value = nombre;
-    new bootstrap.Modal(document.getElementById('editModal')).show();
+function editRecord(id, nombre) {
+  document.getElementById('editIdOs').value = id;
+  document.getElementById('editNombre').value = nombre;
+  new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+
+function showAlert(message) {
+  document.getElementById("alertMessage").textContent = message;
+  var alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+  alertModal.
+  show();
+}
+
+function confirmDelete(id) {
+    deleteId = id; // Guardamos el ID de la obra social a eliminar
+    var confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    confirmDeleteModal.show();
   }
+
+  document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+    // Redirigir a la URL de eliminación con el ID correspondiente
+    window.location.href = '?delete=' + deleteId;
+  });
+
 </script>
 
 <!-- PHP Funcionalidad de Backend -->
 <?php
 // Manejo de eliminación
 if (isset($_GET['delete'])) {
-    $id_os = intval($_GET['delete']);
-    $stmt = $conexion->prepare("DELETE FROM obras_sociales WHERE ID_OS = ?");
-    $stmt->bind_param("i", $id_os);
+  $id_os = intval($_GET['delete']);
+  $stmt = $conexion->prepare("DELETE FROM obras_sociales WHERE ID_OS = ?");
+  $stmt->bind_param("i", $id_os);
 
-    try {
-        $stmt->execute();
-        echo "<script>alert('Obra social eliminada exitosamente'); window.location.href='crud_obras_sociales.php';</script>";
-    } catch (mysqli_sql_exception $e) {
-        echo "<script>alert('No se puede eliminar la obra social porque tiene datos relacionados.');</script>";
-    }
-    $stmt->close();
+  try {
+      $stmt->execute();
+      echo "<script>showAlert('Obra social eliminada exitosamente');</script>";
+      echo "<script>setTimeout(function(){ window.location.href='crud_obras_sociales.php'; }, 2000);</script>";
+  } catch (mysqli_sql_exception $e) {
+      echo "<script>showAlert('No se puede eliminar la obra social porque tiene datos relacionados.');</script>";
+  }
+  $stmt->close();
 }
 
 // Actualización de datos
 if (isset($_POST['actualizar'])) {
-    $id_os = intval($_POST['id_os']);
-    $nombre = $_POST['nombre'];
+  $id_os = intval($_POST['id_os']);
+  $nombre = $_POST['nombre'];
 
-    $stmt = $conexion->prepare("UPDATE obras_sociales SET Nombre = ? WHERE ID_OS = ?");
-    $stmt->bind_param("si", $nombre, $id_os);
+  $stmt = $conexion->prepare("UPDATE obras_sociales SET Nombre = ? WHERE ID_OS = ?");
+  $stmt->bind_param("si", $nombre, $id_os);
 
-    if ($stmt->execute()) {
-      echo "<script>alert('Obra social actualizada exitosamente');</script>";
-      echo "<script>window.location.href = 'crud_obras_sociales.php';</script>"; // Redirige al listado
-
-    } else {
-        echo "<script>alert('Error al actualizar la obra social');</script>";
-    }
-    $stmt->close();
+  if ($stmt->execute()) {
+      echo "<script>showAlert('Obra social actualizada exitosamente');</script>";
+      echo "<script>setTimeout(function(){ window.location.href='crud_obras_sociales.php'; }, 2000);</script>";
+  } else {
+      echo "<script>showAlert('Error al actualizar la obra social');</script>";
+  }
+  $stmt->close();
 }
-
-
 
 // Inserción de nueva obra social
 if (isset($_POST['guardar_os'])) {
-    $nombre_os = $_POST['nombre_os'];
-    include "conexion.php";
-    $stmt = $conexion->prepare("INSERT INTO obras_sociales (Nombre) VALUES (?)");
-    $stmt->bind_param("s", $nombre_os);
+  $nombre_os = $_POST['nombre_os'];
+  $stmt = $conexion->prepare("INSERT INTO obras_sociales (Nombre) VALUES (?)");
+  $stmt->bind_param("s", $nombre_os);
 
-    if ($stmt->execute()) {
-        echo "<script>alert('Obra social agregada exitosamente'); window.location.href='crud_obras_sociales.php';</script>";
-    
-      } else {
-        echo "<script>alert('Error al agregar la obra social');</script>";
-    }
-
-    $stmt->close();
-    $conexion->close();
+  if ($stmt->execute()) {
+      echo "<script>showAlert('Obra social agregada exitosamente');</script>";
+      echo "<script>setTimeout(function(){ window.location.href='crud_obras_sociales.php'; }, 2000);</script>";
+  } else {
+      echo "<script>showAlert('Error al agregar la obra social');</script>";
+  }
+  $stmt->close();
+  $conexion->close();
 }
 ?>
 </body>

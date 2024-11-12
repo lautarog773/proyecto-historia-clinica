@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <li><a href="index.php">Inicio</a></li>
             <li><a href="perfil.php">Mi Perfil</a></li>
             <li><a href="consulta.php">Consultas</a></li>
-            <li class="dropdown"><a href="crud.php" class="active"><span>CRUD</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <li class="dropdown"><a href="crud.php" class="active"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>                
                 <li><a href="crud_especialidades.php">Especialidades</a></li>
                 <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
@@ -114,33 +114,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
   <main class="main">
     <section id="contact" class="contact section container mt-4">
       <div class="container section-title">
-        <h2>CRUD Cuentas</h2>
+        <h2>ABM Cuentas</h2>
       </div>
 
       <!-- Sección de acciones (Botón + Formulario de búsqueda) -->
-      <div class="row mb-4 align-items-center">
-        <!-- Botón "Nueva Cuenta" -->
-        <div class="col-md-3 col-12 mb-2 mb-md-0">
-          <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#newAccountModal">
-            Nueva Cuenta
-          </button>
-        </div>
+<div class="row mb-4 align-items-end">
+  <!-- Botón "Nueva Cuenta" -->
+  <div class="col-lg-2 col-md-3 col-12 mb-2 mb-md-0">
+    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#newAccountModal">
+      Nueva Cuenta
+    </button>
+  </div>
 
-        <!-- Formulario de búsqueda -->
-        <form method="GET" action="crud_cuentas.php" class="col-md-9 col-12 row gx-2">
-          <div class="col-md-3 col-12 mb-2 mb-md-0">
-            <input type="text" class="form-control" name="id_cuenta" placeholder="🔍 ID Cuenta" value="<?php echo isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : ''; ?>">
-          </div>
-          <div class="col-md-3 col-12 mb-2 mb-md-0">
-            <input type="text" class="form-control" name="buscador" placeholder="🔍 Nombre - Mail" value="<?php echo isset($_GET['buscador']) ? $_GET['buscador'] : ''; ?>">
-          </div>
-          <div class="col-md-3 col-12 mb-2 mb-md-0">
-            <input type="text" class="form-control" name="dni" placeholder="🔍 DNI" value="<?php echo isset($_GET['dni']) ? $_GET['dni'] : ''; ?>">
-          </div>
-          <div class="col-md-3 col-12">
-            <button type="submit" class="btn btn-primary w-100" name="buscar" value="ok">Buscar</button>
-          </div>
-        </form>
+  <!-- Formulario de búsqueda -->
+  <form method="GET" action="crud_cuentas.php" class="col-lg-10 col-md-9 col-12">
+    <div class="row gx-2">
+      <div class="col-lg-2 col-md-3 col-6 mb-2 mb-md-0">
+        <input type="text" class="form-control" name="id_cuenta" placeholder="🔍 ID Cuenta" value="<?php echo isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : ''; ?>">
+      </div>
+      <div class="col-lg-3 col-md-3 col-6 mb-2 mb-md-0">
+        <input type="text" class="form-control" name="buscador" placeholder="🔍 Nombre - Mail" value="<?php echo isset($_GET['buscador']) ? $_GET['buscador'] : ''; ?>">
+      </div>
+      <div class="col-lg-2 col-md-3 col-6 mb-2 mb-md-0">
+        <input type="text" class="form-control" name="dni" placeholder="🔍 DNI" value="<?php echo isset($_GET['dni']) ? $_GET['dni'] : ''; ?>">
+      </div>
+      <div class="col-lg-3 col-md-3 col-6 mb-2 mb-md-0">
+        <select class="form-select" name="tipo_cuenta">
+          <option value="">Tipo de Cuenta</option>
+          <option value="1" <?php if (isset($_GET['tipo_cuenta']) && $_GET['tipo_cuenta'] == '1') echo 'selected'; ?>>Paciente</option>
+          <option value="2" <?php if (isset($_GET['tipo_cuenta']) && $_GET['tipo_cuenta'] == '2') echo 'selected'; ?>>Profesional</option>
+          <option value="3" <?php if (isset($_GET['tipo_cuenta']) && $_GET['tipo_cuenta'] == '3') echo 'selected'; ?>>Administrador</option>
+        </select>
+      </div>
+      <div class="col-lg-2 col-md-12 col-12 mt-2 mt-lg-0">
+        <button type="submit" class="btn btn-primary w-100" name="buscar" value="ok">Buscar</button>
+      </div>
+    </div>
+  </form>
+</div>
 
 
       <!-- Tabla de resultados -->
@@ -163,6 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
               $id_cuenta = isset($_GET['id_cuenta']) ? $_GET['id_cuenta'] : '';
               $buscador = isset($_GET['buscador']) ? $_GET['buscador'] : '';
               $dni = isset($_GET['dni']) ? $_GET['dni'] : '';
+              $tipo_cuenta = isset($_GET['tipo_cuenta']) ? $_GET['tipo_cuenta'] : '';
 
               $query = "SELECT 
                           cuentas.ID_Cuenta, 
@@ -204,6 +216,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                   $types .= "ss";
               }
 
+              // Filtro por Tipo de Cuenta
+              if (!empty($tipo_cuenta)) {
+                  $query .= " AND cuentas.ID_Tipo = ?";
+                  $params[] = $tipo_cuenta;
+                  $types .= "i";
+              }
+
               if (!empty($params)) {
                   $stmt = $conexion->prepare($query);
                   $stmt->bind_param($types, ...$params);
@@ -223,10 +242,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <td><?= $datos->Apellido ?></td> <!-- Mostrar Apellido -->
                 <td><?= $datos->DNI ?></td> <!-- Mostrar DNI -->
                 <td>
-                  <a href="#" onclick="editRecord(<?= $datos->ID_Cuenta ?>, <?= $datos->ID_Tipo ?>, '<?= $datos->Mail ?>')" title="Editar" class="text-primary me-3">
+                  <a href="#" onclick="editRecord(<?= $datos->ID_Cuenta ?>);" title="Editar" class="text-primary me-3">
                     <i class="fa-solid fa-user-pen"></i>
                   </a>
-                  <a href="?delete=<?= $datos->ID_Cuenta ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar esta cuenta?');" title="Eliminar" class="text-danger">
+                  <a href="#" onclick="confirmDelete(<?= $datos->ID_Cuenta ?>);" title="Eliminar" class="text-danger">
                     <i class="fa-solid fa-trash"></i>
                   </a>
                 </td>
@@ -472,6 +491,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
   </div>
 </div>
 
+<!-- Modal para mostrar mensajes de error y confirmación -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertModalLabel">Mensaje</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="alertMessage">
+        <!-- El mensaje se mostrará aquí -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas eliminar esta cuenta?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <footer class="footer light-background">
     <div class="container copyright text-center">
@@ -613,10 +668,26 @@ function toggleFields() {
 }
 </script>
 
+<script>
+function showAlert(message) {
+  document.getElementById("alertMessage").textContent = message;
+  var alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+  alertModal.show();
+}
 
+let deleteId = null; // Variable para almacenar el ID a eliminar
 
+function confirmDelete(id) {
+  deleteId = id; // Guardamos el ID de la cuenta a eliminar
+  var confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+  confirmDeleteModal.show();
+}
 
-
+document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+  // Redirigir a la URL de eliminación con el ID correspondiente
+  window.location.href = '?delete=' + deleteId;
+});
+</script>
 
   <!--Backend -->
 
@@ -677,7 +748,8 @@ if (isset($_GET['delete'])) {
           // Confirmar transacción
           $conexion->commit();
 
-          echo "<script>alert('Cuenta eliminada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+          echo "<script>showAlert('Cuenta eliminada exitosamente');</script>";
+          echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
       } catch (mysqli_sql_exception $e) {
           // Revertir transacción
           $conexion->rollback();
@@ -685,21 +757,21 @@ if (isset($_GET['delete'])) {
           // Verificar el código de error
           if ($e->getCode() == 1451) {
               // Violación de restricción de clave foránea
-              echo "<script>alert('No se puede eliminar la cuenta porque tiene datos relacionados.'); window.location.href='crud_cuentas.php';</script>";
+              echo "<script>showAlert('No se puede eliminar la cuenta porque tiene datos relacionados.');</script>";
+              echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
           } else {
               // Otros errores
-              echo "<script>alert('Error al eliminar la cuenta: " . $e->getMessage() . "'); window.location.href='crud_cuentas.php';</script>";
+              echo "<script>showAlert('Error al eliminar la cuenta: " . $e->getMessage() . "');</script>";
+              echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
           }
       }
   } else {
-      echo "<script>alert('Cuenta no encontrada'); window.location.href='crud_cuentas.php';</script>";
+      echo "<script>showAlert('Cuenta no encontrada');</script>";
+      echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
   }
 }
 
 
-
-
-// Actualización de datos
 // Actualización de datos
 if (isset($_POST['actualizar'])) {
   $id_cuenta = intval($_POST['id_cuenta']);
@@ -740,7 +812,7 @@ if (isset($_POST['actualizar'])) {
 
           // Verificar que $id_especialidad tiene un valor válido
           if (empty($id_especialidad)) {
-              echo "<script>alert('Error: Debe seleccionar una especialidad.');</script>";
+              echo "<script>showAlert('Error: Debe seleccionar una especialidad.');</script>";
               exit;
           }
 
@@ -758,14 +830,13 @@ if (isset($_POST['actualizar'])) {
           }
           $stmt_profesional->close();
       }
-      echo "<script>alert('Cuenta actualizada exitosamente');</script>";
-      echo "<script>window.location.href = 'crud_cuentas.php';</script>";
+      echo "<script>showAlert('Cuenta actualizada exitosamente');</script>";
+      echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
   } else {
-      echo "<script>alert('Error al actualizar la cuenta');</script>";
+      echo "<script>showAlert('Error al actualizar la cuenta');</script>";
   }
   $stmt->close();
 }
-
 
   // Inserción de nueva cuenta
 
@@ -790,8 +861,7 @@ if (isset($_POST['actualizar'])) {
         $stmt_check_dni->execute();
         $stmt_check_dni->store_result();
         if ($stmt_check_dni->num_rows > 0) {
-            echo "<script>alert('Error: El DNI ya está registrado.');</script>";
-            $stmt_check_dni->close();
+            echo "<script>showAlert('Error: El DNI ya está registrado.');</script>";
             exit;
         }
         $stmt_check_dni->close();
@@ -808,7 +878,8 @@ if (isset($_POST['actualizar'])) {
             $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Paciente) VALUES (?, ?, ?, ?)");
             $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_paciente);
             $stmt_cuenta->execute();
-            echo "<script>alert('Cuenta de paciente agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+            echo "<script>showAlert('Cuenta de paciente agregada exitosamente');</script>";
+            echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
         }
 
     } elseif ($id_tipo === 2) { // Profesional
@@ -822,7 +893,8 @@ if (isset($_POST['actualizar'])) {
             $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password, ID_Profesional) VALUES (?, ?, ?, ?)");
             $stmt_cuenta->bind_param("issi", $id_tipo, $mail, $password, $id_profesional);
             $stmt_cuenta->execute();
-            echo "<script>alert('Cuenta de profesional agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+            echo "<script>showAlert('Cuenta de profesional agregada exitosamente');</script>";
+            echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
         }
 
     } elseif ($id_tipo === 3) { // Administrador
@@ -830,15 +902,15 @@ if (isset($_POST['actualizar'])) {
         $stmt_cuenta = $conexion->prepare("INSERT INTO cuentas (ID_Tipo, Mail, Password) VALUES (?, ?, ?)");
         $stmt_cuenta->bind_param("iss", $id_tipo, $mail, $password);
         if ($stmt_cuenta->execute()) {
-            echo "<script>alert('Cuenta de administrador agregada exitosamente'); window.location.href='crud_cuentas.php';</script>";
+            echo "<script>showAlert('Cuenta de administrador agregada exitosamente');</script>";
+            echo "<script>setTimeout(function(){ window.location.href='crud_cuentas.php'; }, 2000);</script>";
         } else {
-            echo "<script>alert('Error al insertar la cuenta de administrador');</script>";
+            echo "<script>showAlert('Error al insertar la cuenta de administrador');</script>";
         }
     }
 }
 
 ?>
-
 
 </body>
 </html>
