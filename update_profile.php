@@ -6,20 +6,20 @@ $userId = $_SESSION['ID_Cuenta'];
 $field = $_POST['field'];
 $newValue = $_POST['fieldValue'];
 
-// campos permitidos para actualizar
-$allowedFields = ['Nombre', 'Apellido', 'ObraSocial', 'mail'];
+// Campos permitidos para actualizar
+$allowedFields = ['Nombre', 'Apellido', 'ObraSocial', 'mail', 'Especialidad'];
 
-// valor válido
+// Verificar si el campo es válido y el valor no está vacío
 if (in_array($field, $allowedFields) && !empty($newValue)) {
     
-    // validación formato de correo electrónico
+    // Validar el formato de correo electrónico si se trata del campo 'mail'
     if ($field === 'mail' && !filter_var($newValue, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error'] = "Formato de correo electrónico no válido.";
         header("Location: perfil.php");
         exit();
     }
 
-    // paciente o profesional
+    // Obtener si el usuario es un paciente o un profesional
     $query = "SELECT ID_Paciente, ID_Profesional FROM cuentas WHERE ID_Cuenta = ?";
     $stmt = $conexion->prepare($query);
     $stmt->bind_param("i", $userId);
@@ -27,9 +27,9 @@ if (in_array($field, $allowedFields) && !empty($newValue)) {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
 
-    // campo según corresponda
+    // Actualizar el campo correspondiente
     if ($field === 'mail') {
-        // correo en la tabla 'cuentas'
+        // Actualizar el correo en la tabla 'cuentas'
         $updateQuery = "UPDATE cuentas SET mail = ? WHERE ID_Cuenta = ?";
         $stmt = $conexion->prepare($updateQuery);
         if (!$stmt) {
@@ -38,8 +38,9 @@ if (in_array($field, $allowedFields) && !empty($newValue)) {
             exit();
         }
         $stmt->bind_param('si', $newValue, $userId);
+
     } elseif ($field === 'ObraSocial') {
-        // ID_OS basado en el nombre de la obra social
+        // Obtener el ID_OS basado en el nombre de la obra social
         $os_query = "SELECT ID_OS FROM obras_sociales WHERE Nombre = ?";
         $os_stmt = $conexion->prepare($os_query);
         $os_stmt->bind_param("s", $newValue);
@@ -47,21 +48,40 @@ if (in_array($field, $allowedFields) && !empty($newValue)) {
         $os_result = $os_stmt->get_result();
         $obraSocial = $os_result->fetch_assoc();
 
-        // obra social válida
+        // Verificar si la obra social es válida
         if (!$obraSocial) {
             $_SESSION['error'] = "Obra Social no válida.";
             header("Location: perfil.php");
             exit();
         }
 
-        $newValue = $obraSocial['ID_OS'];  // Cambiar $newValue al ID_OS correspondiente
-        $field = 'ID_OS';  // Cambiar el campo a ID_OS para la actualización en la base de datos
+        $newValue = $obraSocial['ID_OS'];
+        $field = 'ID_OS';
+
+    } elseif ($field === 'Especialidad') {
+        // Obtener el ID_Especialidad basado en el nombre de la especialidad
+        $especialidad_query = "SELECT ID_Especialidad FROM especialidades WHERE Nombre = ?";
+        $especialidad_stmt = $conexion->prepare($especialidad_query);
+        $especialidad_stmt->bind_param("s", $newValue);
+        $especialidad_stmt->execute();
+        $especialidad_result = $especialidad_stmt->get_result();
+        $especialidad = $especialidad_result->fetch_assoc();
+
+        // Verificar si la especialidad es válida
+        if (!$especialidad) {
+            $_SESSION['error'] = "Especialidad no válida.";
+            header("Location: perfil.php");
+            exit();
+        }
+
+        $newValue = $especialidad['ID_Especialidad'];
+        $field = 'ID_Especialidad';
     }
 
-    // actualización en función del tipo de usuario y campo
+    // Actualizar el campo en la tabla correspondiente
     if ($field !== 'mail') {
         if ($user['ID_Paciente']) {
-            // paciente
+            // Actualizar para pacientes
             $patientId = $user['ID_Paciente'];
             $updateQuery = "UPDATE pacientes SET $field = ? WHERE ID_Paciente = ?";
             $stmt = $conexion->prepare($updateQuery);
@@ -76,7 +96,7 @@ if (in_array($field, $allowedFields) && !empty($newValue)) {
                 $stmt->bind_param('si', $newValue, $patientId);
             }
         } elseif ($user['ID_Profesional']) {
-            // profesional
+            // Actualizar para profesionales
             $doctorId = $user['ID_Profesional'];
             $updateQuery = "UPDATE doctores SET $field = ? WHERE ID_Profesional = ?";
             $stmt = $conexion->prepare($updateQuery);
@@ -85,7 +105,7 @@ if (in_array($field, $allowedFields) && !empty($newValue)) {
                 header("Location: perfil.php");
                 exit();
             }
-            if ($field === 'ID_OS') {
+            if ($field === 'ID_Especialidad') {
                 $stmt->bind_param('ii', $newValue, $doctorId);
             } else {
                 $stmt->bind_param('si', $newValue, $doctorId);
@@ -93,7 +113,7 @@ if (in_array($field, $allowedFields) && !empty($newValue)) {
         }
     }
 
-    // verificar el resultado
+    // Ejecutar la actualización
     if ($stmt->execute()) {
         $_SESSION['message'] = "Campo actualizado exitosamente";
         header("Location: perfil.php");
@@ -109,4 +129,3 @@ if (in_array($field, $allowedFields) && !empty($newValue)) {
     exit();
 }
 ?>
-

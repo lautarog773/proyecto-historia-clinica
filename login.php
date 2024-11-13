@@ -19,7 +19,7 @@ $resultado = mysqli_num_rows($consulta);
 if($resultado > 0){/*Comienza una estructura condicional que verifica si hay al menos 
 	un resultado en la consulta (es decir, si el usuario existe)*/
 
-	$respuesta=mysqli_fetch_array(result: $consulta);
+	$respuesta=mysqli_fetch_array($consulta);
 	/* Extrae una fila de resultados de la consulta y la almacena como un array asociativo en $respuesta*/
 
 	$_SESSION['ID_Tipo'] = $respuesta['ID_Tipo'];
@@ -27,14 +27,14 @@ if($resultado > 0){/*Comienza una estructura condicional que verifica si hay al 
 		if($respuesta['ID_Tipo']==1){
 
 			$consulta2 = mysqli_query($conexion, "SELECT Nombre, Apellido FROM pacientes WHERE ID_Paciente = " . $respuesta['ID_Paciente']);
-			$respuesta2=mysqli_fetch_array(result: $consulta2);
+			$respuesta2=mysqli_fetch_array($consulta2);
 			$_SESSION['Nombre']=$respuesta2['Nombre'];/*Almacena el nombre del usuario en la sesión*/
 			$_SESSION['Apellido']=$respuesta2['Apellido'];/* Almacena el apellido del usuario en la sesión*/
 		
 		}elseif($respuesta['ID_Tipo']==2){
 		
 			$consulta2 = mysqli_query($conexion, "SELECT Nombre, Apellido FROM doctores WHERE ID_Profesional = " . $respuesta['ID_Profesional']);
-			$respuesta2=mysqli_fetch_array(result: $consulta2);
+			$respuesta2=mysqli_fetch_array($consulta2);
 			$_SESSION['Nombre']=$respuesta2['Nombre'];/*Almacena el nombre del usuario en la sesión*/
 			$_SESSION['Apellido']=$respuesta2['Apellido'];/* Almacena el apellido del usuario en la sesión*/
 		}  
