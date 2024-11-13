@@ -70,8 +70,8 @@ if (!isset($_SESSION['ID_Cuenta'])) {
         <nav id="navmenu" class="navmenu">
           <ul>
             <li><a href="index.php">Inicio</a></li>
-            <li><a href="perfil.php">Mi Perfil</a></li>
-            <li><a href="consulta.php">Consultas</a></li>
+            <!-- <li><a href="perfil.php">Mi Perfil</a></li>
+            <li><a href="consulta.php">Consultas</a></li> -->
             <li class="dropdown"><a href="crud.php" class="active"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>                
                 <li><a href="crud_especialidades.php">Especialidades</a></li>

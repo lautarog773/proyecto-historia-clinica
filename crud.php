@@ -72,10 +72,12 @@ if (!isset($_SESSION['ID_Cuenta'])) {
         <nav id="navmenu" class="navmenu">
           <ul>
             <li><a href="index.php">Inicio<br></a></li>
-            <li><a href="perfil.php">Mi Perfil</a></li>
-            <li><a href="consulta.php">Consultas</a></li>
+
+            <!-- <li><a href="perfil.php">Mi Perfil</a></li>
+                  <li><a href="consulta.php">Consultas</a></li> -->
+
             <li class="dropdown"><a href="crud.php" class="active"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-              <ul>                
+              <ul>
                 <li><a href="crud_especialidades.php">Especialidades</a></li>
                 <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
                 <li><a href="crud_cuentas.php">Cuentas</a></li>
@@ -98,66 +100,66 @@ if (!isset($_SESSION['ID_Cuenta'])) {
 
     <section id="mi-perfil" class="section">
 
-    <!-- CRUD  -->
-    <section id="services" class="services section">
+      <!-- CRUD  -->
+      <section id="services" class="services section">
 
-      <div class="container">
-      <div class="section-title" data-aos="fade-up">
-        <h2>Administrador</h2>
-      </div>
-
-        <div class="row gy-4">
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="service-item  position-relative">
-              <div class="icon">
-                <i class="fas fa-heartbeat"></i>
-              </div>
-              <a href="crud_especialidades.php" class="stretched-link">
-                <h3>Especialidades</h3>
-              </a>
-              <p>Agregar, modificar o eliminar especialidades.</p>
-            </div>
+        <div class="container">
+          <div class="section-title" data-aos="fade-up">
+            <h2>Administrador</h2>
           </div>
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item position-relative">
-              <div class="icon">
-                <i class="fas fa-pills"></i>
-              </div>
-              <a href="crud_obras_sociales.php" class="stretched-link">
-                <h3>Obras Sociales</h3>
-              </a>
-              <p>Agregar, modificar o eliminar obras sociales.</p>
-            </div>
-          </div>
+          <div class="row gy-4">
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="service-item position-relative">
-              <div class="icon">
-                <i class="fas fa-hospital-user"></i>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+              <div class="service-item  position-relative">
+                <div class="icon">
+                  <i class="fas fa-heartbeat"></i>
+                </div>
+                <a href="crud_especialidades.php" class="stretched-link">
+                  <h3>Especialidades</h3>
+                </a>
+                <p>Agregar, modificar o eliminar especialidades.</p>
               </div>
-              <a href="crud_cuentas.php" class="stretched-link">
-                <h3>Cuentas</h3>
-              </a>
-              <p>Agregar, modificar o eliminar Cuentas.</p>
             </div>
-          </div><!-- End Service Item -->
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+              <div class="service-item position-relative">
+                <div class="icon">
+                  <i class="fas fa-pills"></i>
+                </div>
+                <a href="crud_obras_sociales.php" class="stretched-link">
+                  <h3>Obras Sociales</h3>
+                </a>
+                <p>Agregar, modificar o eliminar obras sociales.</p>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+              <div class="service-item position-relative">
+                <div class="icon">
+                  <i class="fas fa-hospital-user"></i>
+                </div>
+                <a href="crud_cuentas.php" class="stretched-link">
+                  <h3>Cuentas</h3>
+                </a>
+                <p>Agregar, modificar o eliminar Cuentas.</p>
+              </div>
+            </div><!-- End Service Item -->
+
+          </div>
 
         </div>
 
-        </div>
+      </section><!-- /Services Section -->
 
-    </section><!-- /Services Section -->
+  </main>
 
-</main>
-    
-    <footer class="footer light-background">
+  <footer class="footer light-background">
     <div class="container copyright text-center">
       <p>© 2024 <strong class="px-1 sitename">Historia Clinica Digital</strong> <span>Todos los derechos reservados </span></p>
     </div>
   </footer>
-  
+
 
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

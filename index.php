@@ -92,8 +92,11 @@ if ($result->num_rows > 0) {
         <nav id="navmenu" class="navmenu">
           <ul>
             <li><a href="index.php" class="active">Inicio<br></a></li>
-            <li><a href="perfil.php">Mi Perfil</a></li>
-            <li><a href="consulta.php">Consultas</a></li>
+            <?php if ($tipo_usuario != 3) : ?>
+              <li><a href="perfil.php">Mi Perfil</a></li>
+              <li><a href="consulta.php">Consultas</a></li>
+            <?php endif; ?>
+
             <?php if ($tipo_usuario == 3) : ?>
               <li class="dropdown"><a href="crud.php"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                 <ul>
