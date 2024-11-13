@@ -39,7 +39,7 @@ if ($result->num_rows > 0) {
   }
 } else {
   // Si no se encuentra el usuario, redirigir a login
-  header("Location: login.php");
+  header("Location: form_login.php");
   exit();
 }
 

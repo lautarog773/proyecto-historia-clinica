@@ -4,7 +4,7 @@ $host = "localhost";
 $usuario = "root"; 
 $password = ""; 
 //$base_datos = "proyecto_historia_clinica_v1";
-$base_datos = "proyecto_historia_clinica_v2";
+$base_datos = "proyecto_historia_clinica_v4";
 //$base_datos = "proyecto_historia_clinica_v3";
 
 // Crear conexión
