@@ -472,32 +472,36 @@ unset($_SESSION['tab_activa']);
                               </div>
                             </div>
                           </div>
+                          
+                          <?php if (is_array($historial_estudios) && count($historial_estudios) > 0): ?>
+                                <?php foreach ($historial_estudios as $estudio): ?>
+                                  <?php if ($estudio['id_consulta'] == $consulta['id_consulta']): ?>
+                                    <div class="col-md-4 mb-3">
+                                      <div class="card">
+                                        <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#' . $estudio['id_consulta'] . ' - ' . $estudio['motivo']); ?></h5>
+
+                                        <div class="card-body">
+                                          <p class="card-text">
+                                            <strong>Especialidad:</strong> <?php echo ($estudio['especialidad']); ?><br>
+                                            <strong>Fecha:</strong> <?php echo ($estudio['Fecha']); ?><br>
+                                            <strong>Informe:</strong> <?php echo ($estudio['Informe']); ?><br>
+                                            <strong>Imagen:</strong>
+                                            <?php if (!empty($estudio['Imagenes'])): ?>
+                                              <a href="<?php echo ($estudio['Imagenes']); ?>" target="_blank">Ver Imagen</a>
+                                            <?php else: ?>
+                                              Sin imagen
+                                            <?php endif; ?>
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  <?php endif; ?>
+                                <?php endforeach; ?>
+                              <?php endif; ?>
 
                           <!-- Sección de Estudios Médicos -->
 
-                          <?php if (is_array($historial_estudios) && count($historial_estudios) > 0): ?>
-                            <?php foreach ($historial_estudios as $estudio): ?>
-                              <div class="col-md-4 mb-3">
-                                <div class="card">
-                                  <h5 class="card-header header-estudio"><?php echo 'Estudio asociado a consulta: ' . ('#' . $estudio['id_consulta'] . ' - ' . $estudio['motivo']); ?></h5>
 
-                                  <div class="card-body">
-                                    <p class="card-text">
-                                      <strong>Especialidad:</strong> <?php echo ($estudio['especialidad']); ?><br>
-                                      <strong>Fecha:</strong> <?php echo ($estudio['Fecha']); ?><br>
-                                      <strong>Informe:</strong> <?php echo ($estudio['Informe']); ?><br>
-                                      <strong>Imagen:</strong>
-                                      <?php if (!empty($estudio['Imagenes'])): ?>
-                                        <a href="<?php echo ($estudio['Imagenes']); ?>" target="_blank">Ver Imagen</a>
-                                      <?php else: ?>
-                                        Sin imagen
-                                      <?php endif; ?>
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            <?php endforeach; ?>
-                          <?php endif; ?>
 
 
                         <?php endforeach; ?>

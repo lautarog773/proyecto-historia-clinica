@@ -1,3 +1,34 @@
+<?php
+session_start();
+
+require 'conexion.php';
+
+// Verifica si el usuario está autenticado
+if (isset($_SESSION['ID_Cuenta'])) {
+  // Obtener información del usuario
+  $id_cuenta = $_SESSION['ID_Cuenta'];
+
+  // Consulta para obtener el nombre del usuario
+  $sql = "SELECT c.ID_tipo, p.Nombre AS nombre_paciente, d.Nombre AS nombre_medico
+FROM cuentas c
+LEFT JOIN pacientes p ON c.ID_Paciente = p.ID_Paciente
+LEFT JOIN doctores d ON c.ID_Profesional = d.ID_Profesional
+WHERE ID_Cuenta = $id_cuenta";
+
+  // Ejecuta la consulta
+  $result = $conexion->query($sql);
+
+
+  if ($result->num_rows > 0) {
+    $usuario = $result->fetch_assoc();
+    $tipo_usuario = $usuario['ID_tipo'];
+  }
+} else {
+  $id_cuenta = null;
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,6 +62,37 @@
 
 <body class="index-page">
 
+
+<?php if ($id_cuenta) : ?>
+  <header id="header" class="header sticky-top">
+        <div class="branding d-flex align-items-center">
+            <div class="container position-relative d-flex align-items-center justify-content-between">
+                <a href="index.php" class="logo d-flex align-items-center me-auto">
+                    <h1 class="sitename">Historia Clínica Digital</h1>
+                </a>
+                <nav id="navmenu" class="navmenu">
+                    <ul>
+                        <li><a href="index.php">Inicio</a></li>
+                        <li><a href="perfil.php">Mi Perfil</a></li>
+                        <li><a href="consulta.php">Consultas</a></li>
+                        <?php if ($tipo_usuario == 3) : ?>
+                            <li class="dropdown"><a href="crud.php"><span>Administrador</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                                <ul>
+                                    <li><a href="crud_especialidades.php">Especialidades</a></li>
+                                    <li><a href="crud_obras_sociales.php">Obras Sociales</a></li>
+                                    <li><a href="crud_cuentas.php">Cuentas</a></li>
+                                </ul>
+                            </li>
+                        <?php endif; ?>
+                        <li><a href="contact.php">Contacto</a></li>
+                    </ul>
+                    <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+                </nav>
+                <a class="cta-btn d-none d-sm-block" href="logout.php">Cerrar Sesión</a>
+            </div>
+        </div>
+    </header>
+<?php else : ?>
   <header id="header" class="header sticky-top">
     <div class="branding d-flex align-items-center">
       <div class="container position-relative d-flex align-items-center justify-content-between">
@@ -49,6 +111,13 @@
       </div>
     </div>
   </header>
+<?php endif; ?>
+
+
+
+
+
+
 
   <main class="main">
     <!-- Contact Section -->
